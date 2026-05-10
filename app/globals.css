@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-white/10 bg-black/30 p-5 shadow-lg backdrop-blur;
+  }
+
+  .label {
+    @apply text-xs font-semibold uppercase tracking-wider text-zinc-400;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 font-semibold text-emerald-950 shadow transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-zinc-600 disabled:text-zinc-300;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 px-3 py-1.5 text-sm text-zinc-200 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4 {
+  @apply mt-5 font-semibold text-zinc-100;
+}
+.markdown h1 {
+  @apply text-lg;
+}
+.markdown h2 {
+  @apply mb-2 mt-5 border-l-4 border-emerald-400 pl-3 text-base;
+}
+.markdown h3 {
+  @apply mb-1 mt-4 text-sm uppercase tracking-wide text-emerald-300;
+}
+.markdown p {
+  @apply my-2 leading-relaxed text-zinc-200;
+}
+.markdown ul,
+.markdown ol {
+  @apply my-2 space-y-1 pl-6;
+}
+.markdown ul {
+  @apply list-disc marker:text-emerald-400;
+}
+.markdown ol {
+  @apply list-decimal marker:text-emerald-400;
+}
+.markdown li {
+  @apply text-zinc-200;
+}
+.markdown strong {
+  @apply font-semibold text-emerald-200;
+}
+.markdown code {
+  @apply rounded bg-black/40 px-1.5 py-0.5 text-xs font-mono text-emerald-200;
+}
+.markdown pre {
+  @apply my-3 overflow-x-auto rounded-lg bg-black/50 p-3 text-xs;
+}
+.markdown blockquote {
+  @apply my-2 border-l-4 border-white/20 pl-3 text-zinc-300;
+}
+.markdown a {
+  @apply text-emerald-300 underline underline-offset-2;
+}
+.markdown table {
+  @apply my-3 w-full border-collapse text-xs;
+}
+.markdown th,
+.markdown td {
+  @apply border border-white/10 px-2 py-1 text-left;
+}
+.markdown th {
+  @apply bg-white/5 font-semibold;
+}
