@@ -281,7 +281,7 @@ export const S09PotOdds: React.FC<SP> = ({ dur }) => {
   const labels = ["ポット 100", "相手 100", "あなた 100"];
   return (
     <Stage gap={30}>
-      <Kicker delay={2}>なぜ「1/3」なのか ・ ポットオッズ</Kicker>
+      <Kicker delay={2}>コールすべき？ ・ ポットオッズ</Kicker>
       <div style={{ display: "flex", alignItems: "center", gap: 90, justifyContent: "center" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}>
           <div style={{ fontFamily: LATIN, fontSize: 56, fontWeight: 600, color: C.gold, height: 64 }}>{count > 0 ? `= ${total}bb` : ""}</div>
@@ -322,13 +322,14 @@ export const S10Ratio: React.FC<SP> = ({ dur }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
   const barS = ramp(frame, F(0.6), F(0.85));
+  const link = ramp(frame, F(0.78), F(0.92));
   return (
-    <Stage gap={46}>
-      <Kicker delay={2}>理論上の正解</Kicker>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 56, fontSize: 108, fontWeight: 700 }}>
-        <GradientText gradient={GRAD.gold} fontSize={108} weight={700} delay={F(0.06)}>バリュー 2</GradientText>
+    <Stage gap={40}>
+      <Kicker delay={2}>相手はどう打つべきか</Kicker>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 56, fontSize: 100, fontWeight: 700 }}>
+        <GradientText gradient={GRAD.gold} fontSize={100} weight={700} delay={F(0.06)}>バリュー 2</GradientText>
         <span style={{ color: C.muted, fontFamily: LATIN }}>:</span>
-        <GradientText gradient={GRAD.silver} fontSize={108} weight={700} delay={F(0.16)}>ブラフ 1</GradientText>
+        <GradientText gradient={GRAD.silver} fontSize={100} weight={700} delay={F(0.16)}>ブラフ 1</GradientText>
       </div>
       <div style={{ display: "flex", gap: 70, alignItems: "flex-start", justifyContent: "center" }}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
@@ -347,6 +348,9 @@ export const S10Ratio: React.FC<SP> = ({ dur }) => {
       <div style={{ display: "flex", width: 1000, height: 30, borderRadius: 15, overflow: "hidden", border: `1px solid ${C.line}`, margin: "0 auto" }}>
         <div style={{ width: `${barS * 66.6}%`, background: GRAD.gold }} />
         <div style={{ flex: 1, background: GRAD.silver }} />
+      </div>
+      <div style={{ textAlign: "center", opacity: link, transform: `translateY(${(1 - link) * 14}px)`, fontSize: 42, fontWeight: 600 }}>
+        あなたが勝てるのは <span style={{ color: C.silver }}>3回に1回</span> <span style={{ color: C.muted }}>＝</span> <span style={{ color: C.gold }}>あの33%と同じ</span>
       </div>
     </Stage>
   );
@@ -369,7 +373,10 @@ export const S11Indiff: React.FC<SP> = ({ dur }) => {
   return (
     <AbsoluteFill style={{ fontFamily: FONT }}>
       <TopKicker>均衡点 ・ インディファレンス</TopKicker>
-      <div style={{ position: "absolute", top: 220, left: 0, right: 0, height: 340 }}>
+      <div style={{ position: "absolute", top: 172, left: 0, right: 0, textAlign: "center", fontSize: 40, color: C.inkSoft, fontWeight: 500, opacity: ramp(frame, F(0.08), F(0.24)) }}>
+        勝てるのは <span style={{ color: C.gold, fontWeight: 700 }}>3回に1回</span> <span style={{ color: C.muted, fontFamily: LATIN }}>→</span> コールはちょうど<span style={{ color: C.gold, fontWeight: 700 }}>トントン</span>
+      </div>
+      <div style={{ position: "absolute", top: 250, left: 0, right: 0, height: 340 }}>
         <div style={{ position: "absolute", left: CX - 5, top: 60, width: 10, height: 220, background: C.line }} />
         <div style={{ position: "absolute", left: CX - 80, top: 278, width: 160, height: 18, borderRadius: 8, background: C.line }} />
         <div style={{ position: "absolute", left: CX - 300, top: 96, width: 600, height: 10, background: GRAD.gold, borderRadius: 5, transform: `rotate(${ang}deg)`, transformOrigin: "center" }} />
