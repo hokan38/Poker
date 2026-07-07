@@ -261,10 +261,11 @@ export const S08River: React.FC<SP> = ({ dur }) => {
       <TopKicker>直感例 II ・ リバー（実戦の場面）</TopKicker>
       <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", paddingTop: 30, paddingBottom: 130 }}>
         <div style={{ transform: "scale(0.92)" }}>
-          <PokerTable board={["As", "Kd", "8h", "4c", "2s"]} hero={["Qh", "Qc"]} frame={frame} boardDelay={F(0.08)} heroDelay={F(0.36)} potDelay={F(0.56)} />
+          <PokerTable board={["Ks", "Ts", "9s", "8d", "3h"]} hero={["Ah", "Kd"]} frame={frame} boardDelay={F(0.08)} heroDelay={F(0.36)} potDelay={F(0.56)} />
         </div>
       </AbsoluteFill>
-      <div style={{ position: "absolute", top: 150, right: 120, fontSize: 34, color: C.gold, fontWeight: 600, opacity: ramp(frame, F(0.36), F(0.46)) }}>あなた ＝ ブラフキャッチャー</div>
+      <div style={{ position: "absolute", top: 150, right: 110, textAlign: "right", fontSize: 34, color: C.gold, fontWeight: 600, opacity: ramp(frame, F(0.36), F(0.46)), lineHeight: 1.4 }}>あなた ＝ Kのトップペア<br /><span style={{ fontSize: 27, color: C.inkSoft }}>ブラフキャッチャー</span></div>
+      <div style={{ position: "absolute", top: 150, left: 110, fontSize: 30, color: C.silver, fontWeight: 500, opacity: ramp(frame, F(0.12), F(0.24)), lineHeight: 1.4 }}>♠フラッシュ<br />ストレートが<br />ありうる盤面</div>
     </AbsoluteFill>
   );
 };
@@ -322,8 +323,9 @@ export const S10Ratio: React.FC<SP> = ({ dur }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
   // 相手のブラフ頻度メーター（0→33%→100%）。針は分かれ目（33%）へ収束＝「ここが境目」。
-  const needle = interpolate(frame, [F(0.62), F(0.86)], [12, 33.3], { ...clamp, easing: EO });
-  const gauge = ramp(frame, F(0.5), F(0.66));
+  const needle = interpolate(frame, [F(0.66), F(0.88)], [12, 33.3], { ...clamp, easing: EO });
+  const bridge = ramp(frame, F(0.42), F(0.54));
+  const gauge = ramp(frame, F(0.56), F(0.7));
   const outcome = (delay: number, cards: string[], label: string, res: string, col: string, win: boolean) => {
     const s = spring({ frame: frame - delay, fps: 30, config: { damping: 16 } });
     return (
@@ -341,12 +343,16 @@ export const S10Ratio: React.FC<SP> = ({ dur }) => {
         あなたが勝てるのは、相手が<span style={{ color: C.gold, fontWeight: 700 }}>ブラフ</span>のときだけ
       </div>
       <div style={{ display: "flex", gap: 60, alignItems: "stretch", justifyContent: "center", maxWidth: 1300, margin: "0 auto", width: "100%" }}>
-        {outcome(F(0.14), ["As", "Js"], "相手がブラフなら", "あなたの勝ち", C.gold, true)}
-        {outcome(F(0.3), ["Kd", "Kc"], "相手が本物なら", "あなたの負け", C.silver, false)}
+        {outcome(F(0.14), ["6c", "5h"], "相手がブラフなら", "あなたの勝ち", C.gold, true)}
+        {outcome(F(0.3), ["Qd", "Jd"], "相手がストレート・フラッシュなら", "あなたの負け", C.silver, false)}
+      </div>
+      {/* 勝てる割合＝相手のブラフの割合、という橋渡し */}
+      <div style={{ textAlign: "center", fontSize: 42, fontWeight: 600, opacity: bridge, transform: `translateY(${(1 - bridge) * 12}px)` }}>
+        あなたが勝てる割合 <span style={{ color: C.muted, fontFamily: LATIN }}>＝</span> 相手が<span style={{ color: C.gold }}>ブラフ</span>の割合
       </div>
       {/* ブラフ頻度メーター：33%を境にコール／降りる */}
       <div style={{ opacity: gauge, transform: `translateY(${(1 - gauge) * 16}px)`, maxWidth: 1200, margin: "6px auto 0", width: "100%" }}>
-        <div style={{ fontSize: 30, color: C.muted, textAlign: "center", marginBottom: 14 }}>相手のブラフ頻度</div>
+        <div style={{ fontSize: 30, color: C.muted, textAlign: "center", marginBottom: 14 }}>相手がブラフの割合</div>
         <div style={{ position: "relative", height: 46 }}>
           <div style={{ display: "flex", width: "100%", height: 46, borderRadius: 23, overflow: "hidden", border: `1px solid ${C.line}` }}>
             <div style={{ width: "33.3%", background: GRAD.silver, display: "grid", placeItems: "center", fontSize: 28, fontWeight: 700, color: "#12100a" }}>降りる</div>
