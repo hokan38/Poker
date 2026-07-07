@@ -19,10 +19,16 @@ export const HandIcon: React.FC<{ kind: "rock" | "scissors" | "paper"; size?: nu
       )}
       {kind === "scissors" && (
         <>
-          <rect x="45" y="8" width="11" height="58" rx="5.5" transform="rotate(-16 50 40)" />
-          <rect x="45" y="8" width="11" height="58" rx="5.5" transform="rotate(16 50 40)" />
-          <circle cx="42" cy="76" r="12" fill="none" stroke={color} strokeWidth="7" />
-          <circle cx="66" cy="76" r="12" fill="none" stroke={color} strokeWidth="7" />
+          {/* 拳 */}
+          <rect x="30" y="50" width="44" height="38" rx="14" />
+          {/* 折った指の関節 */}
+          <circle cx="63" cy="52" r="8" />
+          <circle cx="72" cy="55" r="6.5" />
+          {/* 立てた2本指（V） */}
+          <rect x="36" y="8" width="12" height="48" rx="6" transform="rotate(-16 42 52)" />
+          <rect x="52" y="6" width="12" height="50" rx="6" transform="rotate(14 58 52)" />
+          {/* 親指 */}
+          <rect x="18" y="60" width="20" height="11" rx="5.5" transform="rotate(-22 28 65)" />
         </>
       )}
       {kind === "paper" && (
