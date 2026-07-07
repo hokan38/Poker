@@ -1,6 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, interpolate, Sequence, Series, staticFile, useCurrentFrame } from "remotion";
 import { bg, C, FONT, GRAD } from "./theme";
+import { LATIN } from "./fonts";
 import { Backdrop } from "./components/Backdrop";
 import { SCENES } from "./scenes";
 import manifest from "./manifest.json";
@@ -30,7 +31,7 @@ const HUD: React.FC = () => {
     <>
       <div style={{ position: "absolute", left: 60, bottom: 46, display: "flex", alignItems: "center", gap: 16, fontFamily: FONT }}>
         <span style={{ width: 26, height: 1.5, background: C.gold }} />
-        <span style={{ color: C.inkSoft, fontWeight: 500, fontSize: 25, letterSpacing: "0.22em" }}>POKER GTO ｜ EP.1</span>
+        <span style={{ fontFamily: LATIN, color: C.inkSoft, fontWeight: 600, fontSize: 27, letterSpacing: "0.28em" }}>POKER GTO ｜ EP.1</span>
       </div>
       <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 3, background: "rgba(255,255,255,0.06)" }}>
         <div style={{ width: `${p * 100}%`, height: "100%", background: GRAD.gold }} />

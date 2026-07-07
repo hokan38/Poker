@@ -9,6 +9,9 @@
     "still": "remotion still Episode1 out/still.png --browser-executable=/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
   },
   "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.2.11",
+    "@fontsource/shippori-mincho": "^5.2.8",
+    "@fontsource/zen-kaku-gothic-new": "^5.2.7",
     "@remotion/cli": "4.0.485",
     "react": "18.3.1",
     "react-dom": "18.3.1",

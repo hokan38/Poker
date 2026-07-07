@@ -18,8 +18,9 @@ export const C = {
   panel: "rgba(255,255,255,0.035)",
 };
 
-export const FONT =
-  '"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",system-ui,sans-serif';
+// 見出し・本文は明朝（上質・エディトリアル）、ラテン/数字は Cormorant。
+export const FONT = '"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",serif';
+export const LATIN = '"Cormorant Garamond","Shippori Mincho",serif';
 
 export const GRAD = {
   ink: "linear-gradient(120deg,#ffffff 0%,#ece8de 100%)",

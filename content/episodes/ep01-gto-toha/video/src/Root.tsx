@@ -1,5 +1,6 @@
 import React from "react";
 import { Composition } from "remotion";
+import "./fonts";
 import { Episode1 } from "./Episode1";
 import manifest from "./manifest.json";
 

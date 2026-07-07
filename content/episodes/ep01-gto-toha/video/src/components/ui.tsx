@@ -1,6 +1,7 @@
 import React from "react";
 import { Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { C, FONT, GRAD } from "../theme";
+import { LATIN } from "../fonts";
 
 const EASE = Easing.bezier(0.22, 1, 0.36, 1);
 
@@ -108,7 +109,7 @@ export const Donut: React.FC<{ size?: number; delay?: number; label?: string; co
       <div style={{
         position: "absolute", inset: "30%", borderRadius: "50%", background: C.bg,
         display: "grid", placeItems: "center", textAlign: "center", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.14)",
-        color: C.ink, fontWeight: 600, fontSize: size * 0.095, fontFamily: FONT, letterSpacing: "0.04em",
+        color: C.ink, fontWeight: 600, fontSize: size * 0.11, fontFamily: LATIN, letterSpacing: "0.02em",
         opacity: interpolate(s, [0.6, 1], [0, 1], { extrapolateLeft: "clamp" }),
       }}>{label}</div>
     </div>
@@ -129,7 +130,7 @@ export const Bar: React.FC<{
       <div style={{ width, height: 12, background: "rgba(255,255,255,0.08)", borderRadius: 8, overflow: "hidden" }}>
         <div style={{ width: w, height: "100%", background: gradient, borderRadius: 8 }} />
       </div>
-      <div style={{ width: 150, fontSize: 34, fontWeight: 700, color }}>{pct}{suffix}</div>
+      <div style={{ width: 150, fontFamily: LATIN, fontSize: 42, fontWeight: 600, color }}>{pct}{suffix}</div>
     </div>
   );
 };

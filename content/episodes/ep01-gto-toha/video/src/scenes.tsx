@@ -1,6 +1,7 @@
 import React from "react";
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { C, FONT, GRAD } from "./theme";
+import { LATIN } from "./fonts";
 import { Card, CardRow } from "./components/Card";
 import { Bar, ChipStack, Donut, GradientText, Kicker, LightSweep, Panel, Reveal, Stamp } from "./components/ui";
 
@@ -13,7 +14,7 @@ const Stage: React.FC<{ children: React.ReactNode; justify?: string; gap?: numbe
 );
 
 const Pill: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={{ display: "inline-block", padding: "10px 30px", border: `1px solid ${C.gold}`, color: C.gold, borderRadius: 999, fontSize: 26, fontWeight: 500, letterSpacing: "0.22em" }}>
+  <div style={{ display: "inline-block", fontFamily: LATIN, padding: "10px 32px", border: `1px solid ${C.gold}`, color: C.gold, borderRadius: 999, fontSize: 28, fontWeight: 600, letterSpacing: "0.24em" }}>
     {children}
   </div>
 );
@@ -72,7 +73,7 @@ export const S03Def: React.FC = () => (
   <Stage>
     <Kicker delay={2}>GTO とは</Kicker>
     <Reveal delay={10}>
-      <div style={{ fontSize: 104, fontWeight: 700, letterSpacing: "0.01em" }}>
+      <div style={{ fontFamily: LATIN, fontSize: 120, fontWeight: 600, letterSpacing: "0.02em" }}>
         <span style={{ color: C.gold }}>G</span>ame <span style={{ color: C.gold }}>T</span>heory <span style={{ color: C.gold }}>O</span>ptimal
       </div>
     </Reveal>
@@ -269,7 +270,7 @@ export const S08Roadmap: React.FC = () => {
         {steps.map((s, i) => (
           <Reveal key={i} delay={10 + i * 12}>
             <div style={{ display: "flex", alignItems: "center", gap: 34, padding: "20px 8px", borderBottom: `1px solid ${C.line}` }}>
-              <div style={{ color: C.gold, fontWeight: 600, fontSize: 36, width: 84, letterSpacing: "0.04em" }}>{s[0]}</div>
+              <div style={{ fontFamily: LATIN, color: C.gold, fontWeight: 600, fontSize: 52, width: 96, letterSpacing: "0.02em" }}>{s[0]}</div>
               <div style={{ fontSize: 42, fontWeight: 600 }}>{s[1]}</div>
               <div style={{ fontSize: 30, color: C.muted, marginLeft: "auto" }}>{s[2]}</div>
             </div>
@@ -294,7 +295,7 @@ export const S09Summary: React.FC = () => {
         {points.map((p, i) => (
           <Reveal key={i} delay={10 + i * 12}>
             <div style={{ display: "flex", alignItems: "center", gap: 28, fontSize: 42 }}>
-              <span style={{ width: 58, height: 58, borderRadius: "50%", border: `1.5px solid ${C.gold}`, color: C.gold, fontWeight: 600, display: "grid", placeItems: "center", fontSize: 30, flex: "none" }}>{i + 1}</span>
+              <span style={{ width: 58, height: 58, borderRadius: "50%", border: `1.5px solid ${C.gold}`, color: C.gold, fontFamily: LATIN, fontWeight: 600, display: "grid", placeItems: "center", fontSize: 34, flex: "none" }}>{i + 1}</span>
               <span style={{ color: C.inkSoft }}><span style={{ color: C.gold, fontWeight: 700 }}>{p[0]}</span>{p[1]}</span>
             </div>
           </Reveal>
