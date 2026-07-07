@@ -3,6 +3,7 @@ import { AbsoluteFill, Audio, Easing, interpolate, Sequence, Series, staticFile,
 import { bg, C, FONT, GRAD } from "./theme";
 import { LATIN, useFonts } from "./fonts";
 import { Backdrop } from "./components/Backdrop";
+import { Subtitles } from "./components/ui";
 import { SCENES } from "./scenes";
 import manifest from "./manifest.json";
 
@@ -50,7 +51,8 @@ export const Episode1: React.FC = () => {
           const Scene = SCENES[s.id];
           return (
             <Series.Sequence key={s.id} durationInFrames={s.durationInFrames}>
-              <SceneBox duration={s.durationInFrames}>{Scene ? <Scene /> : null}</SceneBox>
+              <SceneBox duration={s.durationInFrames}>{Scene ? <Scene dur={s.durationInFrames} /> : null}</SceneBox>
+              <Subtitles captions={(s as { captions?: { t: string; from: number; to: number }[] }).captions} />
               <Sequence from={s.leadInFrames}>
                 <Audio src={staticFile("narration/" + s.file)} />
               </Sequence>

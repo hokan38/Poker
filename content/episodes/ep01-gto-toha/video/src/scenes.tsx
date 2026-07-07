@@ -3,42 +3,56 @@ import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } fr
 import { C, FONT, GRAD } from "./theme";
 import { LATIN } from "./fonts";
 import { Card, CardRow } from "./components/Card";
-import { Bar, ChipStack, Donut, GradientText, Kicker, LightSweep, Panel, Reveal, Stamp } from "./components/ui";
+import { GradientText, Kicker, Reveal, Stamp } from "./components/ui";
 
+type SP = { dur: number };
+
+/* ============ 共通 ============ */
 const Stage: React.FC<{ children: React.ReactNode; justify?: string; gap?: number }> = ({
-  children, justify = "center", gap = 40,
+  children, justify = "center", gap = 44,
 }) => (
-  <AbsoluteFill style={{ fontFamily: FONT, color: C.ink, padding: "96px 128px", display: "flex", flexDirection: "column", justifyContent: justify, gap }}>
+  <AbsoluteFill style={{ fontFamily: FONT, color: C.ink, padding: "88px 120px 200px", display: "flex", flexDirection: "column", justifyContent: justify, gap }}>
     {children}
   </AbsoluteFill>
 );
+const osc = (f: number, sp: number, ph = 0) => Math.sin(f * sp + ph);
+const pulse = (f: number, sp: number, ph = 0) => 0.5 + 0.5 * Math.sin(f * sp + ph);
+const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
-const Pill: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <div style={{ display: "inline-block", fontFamily: LATIN, padding: "10px 32px", border: `1px solid ${C.gold}`, color: C.gold, borderRadius: 999, fontSize: 28, fontWeight: 600, letterSpacing: "0.24em" }}>
-    {children}
+const Chip: React.FC<{ size?: number; gold?: boolean; style?: React.CSSProperties }> = ({ size = 54, gold = false, style }) => (
+  <div style={{
+    width: size, height: size, borderRadius: "50%",
+    background: gold ? "radial-gradient(circle at 40% 32%, #f0d79a, #c8a96b 72%)" : "radial-gradient(circle at 42% 32%, #2c2c2e, #0f0f11 72%)",
+    border: `2px solid ${gold ? C.goldSoft : C.gold}`, boxShadow: "0 4px 10px rgba(0,0,0,0.55)", ...style,
+  }} />
+);
+const ChipStack: React.FC<{ n?: number; size?: number; gold?: boolean }> = ({ n = 5, size = 88, gold }) => (
+  <div style={{ position: "relative", width: size, height: size * 0.55 + (n - 1) * size * 0.22 }}>
+    {Array.from({ length: n }).map((_, k) => (
+      <div key={k} style={{ position: "absolute", bottom: k * size * 0.22, left: 0 }}><Chip size={size} gold={gold} /></div>
+    ))}
   </div>
 );
 
-/* ---------- 01 タイトル ---------- */
-export const S01Title: React.FC = () => {
+/* ============ 01 タイトル ============ */
+export const S01Title: React.FC<SP> = () => {
   const frame = useCurrentFrame();
   const cards = ["As", "Kh", "Qd", "Jc", "Ts"];
   return (
     <AbsoluteFill style={{ fontFamily: FONT }}>
-      <Stage gap={34}>
-        <Reveal delay={2}><Pill>POKER GTO ・ 全30回シリーズ</Pill></Reveal>
-        <LightSweep delay={28} duration={52}>
-          <GradientText gradient={GRAD.ink} fontSize={126} weight={700} delay={8}>GTOとは何か？</GradientText>
-        </LightSweep>
-        <GradientText gradient={GRAD.gold} fontSize={96} weight={700} delay={16} shine>ポーカー戦略の全体像</GradientText>
-        <Reveal delay={30}>
-          <div style={{ fontSize: 40, color: C.muted, letterSpacing: "0.08em" }}>第1回 ｜ 本格的なポーカー戦略を、美しく、わかりやすく。</div>
+      <Stage gap={30}>
+        <Reveal delay={2}>
+          <div style={{ display: "inline-block", fontFamily: LATIN, padding: "9px 30px", border: `1px solid ${C.gold}`, color: C.gold, borderRadius: 999, fontSize: 27, fontWeight: 600, letterSpacing: "0.26em" }}>POKER GTO STRATEGY</div>
         </Reveal>
+        <div style={{ transform: `translateY(${osc(frame, 0.03) * 4}px)` }}>
+          <GradientText gradient={GRAD.ink} fontSize={128} weight={700} delay={8}>GTOとは何か？</GradientText>
+        </div>
+        <GradientText gradient={GRAD.gold} fontSize={92} weight={700} delay={16} shine>ポーカー戦略の全体像</GradientText>
       </Stage>
-      <div style={{ position: "absolute", bottom: -36, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
+      <div style={{ position: "absolute", bottom: 20, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
         {cards.map((c, i) => (
-          <div key={i} style={{ transform: `rotate(${(i - 2) * 8}deg) translateY(${Math.abs(i - 2) * 24}px)`, margin: "0 -22px" }}>
-            <Card card={c} w={148} frame={frame} delay={36 + i * 5} rise={130} />
+          <div key={i} style={{ transform: `rotate(${(i - 2) * 8}deg) translateY(${Math.abs(i - 2) * 22}px)`, margin: "0 -22px" }}>
+            <Card card={c} w={138} frame={frame} delay={30 + i * 5} rise={140} />
           </div>
         ))}
       </div>
@@ -46,482 +60,430 @@ export const S01Title: React.FC = () => {
   );
 };
 
-/* ---------- 02 フック ---------- */
-export const S02Hook: React.FC = () => (
-  <Stage>
-    <Kicker delay={2}>なぜ、あの人は勝ち続けるのか</Kicker>
-    <Reveal delay={12}>
-      <div style={{ fontSize: 128, fontWeight: 700, display: "flex", alignItems: "center", gap: 44 }}>
-        <span style={{ color: C.muted }}>運？</span>
-        <span style={{ color: C.gold, fontSize: 64, fontWeight: 300 }}>—</span>
-        <GradientText gradient={GRAD.gold} fontSize={138} weight={700} delay={16} shine>戦略</GradientText>
-      </div>
-    </Reveal>
-    <div style={{ display: "flex", alignItems: "flex-end", gap: 70, marginTop: 12 }}>
-      <Reveal delay={26} style={{ maxWidth: 1080 }}>
-        <div style={{ fontSize: 46, lineHeight: 1.6, color: C.inkSoft, fontWeight: 400 }}>
-          同じカード、同じテーブル。長い目で見て勝つ人は、<span style={{ color: C.gold, fontWeight: 600 }}>戦略</span>で勝っている。<br />その土台が、<span style={{ color: C.gold, fontWeight: 600 }}>GTO</span>。
-        </div>
-      </Reveal>
-      <ChipStack n={6} delay={40} label="勝ち続ける" />
-    </div>
-  </Stage>
-);
-
-/* ---------- 03 定義 ---------- */
-export const S03Def: React.FC = () => (
-  <Stage>
-    <Kicker delay={2}>GTO とは</Kicker>
-    <Reveal delay={10}>
-      <div style={{ fontFamily: LATIN, fontSize: 120, fontWeight: 600, letterSpacing: "0.02em" }}>
-        <span style={{ color: C.gold }}>G</span>ame <span style={{ color: C.gold }}>T</span>heory <span style={{ color: C.gold }}>O</span>ptimal
-      </div>
-    </Reveal>
-    <Reveal delay={20}>
-      <div style={{ fontSize: 50, color: C.inkSoft, fontWeight: 400 }}>＝ ゲーム理論的に<span style={{ color: C.gold, fontWeight: 600 }}>最適</span>な戦略</div>
-    </Reveal>
-    <div style={{ marginTop: 28 }}>
-      <Stamp delay={40} fontSize={64}>＝ 相手に搾取されない戦略</Stamp>
-    </div>
-  </Stage>
-);
-
-/* ---------- 04 じゃんけん ---------- */
-export const S04Janken: React.FC = () => {
-  const rows = [
-    { c: C.ink, t: "グー　1/3" },
-    { c: C.gold, t: "チョキ 1/3" },
-    { c: C.silver, t: "パー　1/3" },
-  ];
+/* ============ 02 フック ============ */
+export const S02Hook: React.FC<SP> = ({ dur }) => {
+  const frame = useCurrentFrame();
+  const F = (x: number) => Math.round(x * dur);
+  const grown = interpolate(frame, [F(0.12), F(0.7)], [2, 9], clamp);
+  const n = Math.max(2, Math.floor(grown));
   return (
-    <Stage gap={34}>
-      <Kicker delay={2}>直感例 I ・ じゃんけん</Kicker>
-      <div style={{ display: "flex", alignItems: "center", gap: 96 }}>
-        <Donut size={356} delay={8} label={"1/3\nずつ"} colors={[C.ink, C.gold, C.silver]} />
-        <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
-          {rows.map((r, i) => (
-            <Reveal key={i} delay={16 + i * 6}>
-              <div style={{ display: "flex", alignItems: "center", gap: 22, fontSize: 44, fontWeight: 500 }}>
-                <span style={{ width: 34, height: 34, borderRadius: 6, background: r.c }} />
-                {r.t}
-              </div>
-            </Reveal>
+    <Stage gap={54}>
+      <Kicker delay={2}>なぜ、あの人は勝ち続けるのか</Kicker>
+      <div style={{ display: "flex", alignItems: "center", gap: 40, fontSize: 118, fontWeight: 700 }}>
+        <Reveal delay={10}><span style={{ color: C.muted }}>運</span></Reveal>
+        <Reveal delay={20}><span style={{ fontFamily: LATIN, color: C.gold, fontWeight: 300, fontSize: 70 }}>→</span></Reveal>
+        <GradientText gradient={GRAD.gold} fontSize={128} weight={700} delay={26} shine>戦略</GradientText>
+      </div>
+      <div style={{ position: "relative", height: 240, width: 560, marginTop: 8 }}>
+        <div style={{ position: "absolute", left: 60, bottom: 0 }}>
+          {Array.from({ length: n }).map((_, k) => (
+            <div key={k} style={{ position: "absolute", bottom: k * 20 }}><Chip size={92} gold /></div>
           ))}
-          <Reveal delay={40}>
-            <div style={{ fontSize: 40, color: C.muted, marginTop: 12, lineHeight: 1.55 }}>
-              グー・チョキ・パーを、ランダムに1/3ずつ出せば、<br />相手は何をしても<span style={{ color: C.ink, fontWeight: 600 }}>勝率五分</span>。<br />打ち負かす方法が存在しない。<br />これが「均衡」＝GTO。
-            </div>
-          </Reveal>
+          <div style={{ position: "absolute", bottom: -52, width: 92, textAlign: "center", color: C.gold, fontWeight: 600, fontSize: 28 }}>勝ち続ける</div>
         </div>
+        {[0, 1, 2, 3].map((k) => {
+          const p = ((frame + k * 30) % 120) / 120;
+          return <div key={k} style={{ position: "absolute", left: interpolate(p, [0, 1], [500, 108]), top: interpolate(p, [0, 1], [-80, 150]), opacity: interpolate(p, [0, 0.12, 0.88, 1], [0, 1, 1, 0]) }}><Chip size={44} gold /></div>;
+        })}
       </div>
     </Stage>
   );
 };
 
-/* ---------- じゃんけん：偏ると搾取される ---------- */
-export const SJankenExploit: React.FC = () => (
-  <Stage gap={44}>
-    <Kicker delay={2}>直感例 I ・ 偏りは搾取される</Kicker>
-    <Reveal delay={12}>
-      <div style={{ fontSize: 62, fontWeight: 700, display: "flex", gap: 30, alignItems: "center", flexWrap: "wrap", lineHeight: 1.3 }}>
-        <span style={{ color: C.gold }}>グーを多めに</span>
-        <span style={{ color: C.muted, fontWeight: 300, fontFamily: LATIN }}>→</span>
-        <span style={{ color: C.silver }}>相手はパーを増やす</span>
-        <span style={{ color: C.muted, fontWeight: 300, fontFamily: LATIN }}>→</span>
-        <span style={{ color: C.gold }}>搾取される</span>
-      </div>
-    </Reveal>
-    <Reveal delay={340}>
-      <Panel accent="rgba(200,169,107,0.3)" style={{ maxWidth: 1300 }}>
-        <div style={{ fontSize: 46, color: C.ink, fontWeight: 500, lineHeight: 1.5 }}>
-          戦略が<span style={{ color: C.gold, fontWeight: 700 }}>偏った瞬間</span>に、つけ込む隙が生まれる。<br />
-          均衡に近づくほど、誰にも搾取されない。<span style={{ color: C.muted }}>—— ポーカーも本質は同じ。</span>
-        </div>
-      </Panel>
-    </Reveal>
-  </Stage>
-);
-
-/* ---------- 05 リバー（実カード） ---------- */
-export const S05River: React.FC = () => {
+/* ============ 03 シリーズ（積み上げ） ============ */
+export const S03Series: React.FC<SP> = ({ dur }) => {
   const frame = useCurrentFrame();
-  const board = ["Ks", "9s", "4d", "7h", "2d"];
-  const hero = ["Kh", "Qc"];
+  const F = (x: number) => Math.round(x * dur);
   return (
-    <Stage gap={30}>
-      <Kicker delay={2}>直感例 II ・ リバー（最後のカード）</Kicker>
-      <div>
-        <Reveal delay={6}><div style={{ fontSize: 30, color: C.muted, marginBottom: 14, letterSpacing: "0.18em" }}>BOARD</div></Reveal>
-        <CardRow cards={board} w={148} frame={frame} startDelay={10} stagger={7} />
-      </div>
-      <div style={{ display: "flex", alignItems: "flex-end", gap: 74, marginTop: 6 }}>
-        <div>
-          <Reveal delay={60}><div style={{ fontSize: 30, color: C.gold, marginBottom: 14, letterSpacing: "0.14em", fontWeight: 600 }}>あなた ・ ブラフキャッチャー</div></Reveal>
-          <CardRow cards={hero} w={148} frame={frame} startDelay={64} stagger={7} ring={C.gold} />
-        </div>
-        <Reveal delay={300} style={{ flex: 1 }}>
-          <Panel accent="rgba(200,169,107,0.32)" style={{ display: "flex", alignItems: "center", gap: 32 }}>
-            <ChipStack n={5} delay={306} />
-            <div style={{ fontSize: 40, lineHeight: 1.45, color: C.inkSoft }}>
-              相手が<span style={{ color: C.gold, fontWeight: 700 }}>ポットと同額</span>をベット<br />
-              <span style={{ color: C.muted, fontSize: 32 }}>ポット 100 → 100 ベット</span>
+    <Stage gap={50}>
+      <Kicker delay={2}>基礎から、一段ずつ</Kicker>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 20, height: 320 }}>
+        {[0, 1, 2, 3, 4].map((k) => {
+          const s = spring({ frame: frame - F(0.08 + k * 0.14), fps: 30, config: { damping: 16, stiffness: 120 } });
+          const h = 100 + k * 46;
+          return (
+            <div key={k} style={{ width: 150, height: h * interpolate(s, [0, 1], [0.15, 1]), borderRadius: 12, background: k === 4 ? GRAD.gold : "linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03))", border: `1px solid ${k === 4 ? C.gold : C.line}`, opacity: interpolate(s, [0, 1], [0, 1]), transform: `translateY(${osc(frame, 0.05, k) * 4}px)`, display: "grid", placeItems: "end center", paddingBottom: 14 }}>
+              <span style={{ fontFamily: LATIN, fontSize: 34, fontWeight: 600, color: k === 4 ? "#12100a" : C.muted }}>{`0${k + 1}`}</span>
             </div>
-          </Panel>
-        </Reveal>
+          );
+        })}
       </div>
-      <Reveal delay={560}>
-        <div style={{ fontSize: 54, fontWeight: 700, marginTop: 10 }}>
-          <span style={{ color: C.gold }}>コール？</span>　<span style={{ color: C.muted, fontWeight: 300 }}>それとも</span>　<span style={{ color: C.silver }}>降りる？</span>
-        </div>
-      </Reveal>
     </Stage>
   );
 };
 
-/* ---------- 06 比率 2:1 と 無差別 ---------- */
-const Combo: React.FC<{ cards: string[]; frame: number; delay: number; tint: string; caption: string }> = ({
-  cards, frame, delay, tint, caption,
-}) => (
-  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, background: "rgba(255,255,255,0.03)", border: `1px solid ${tint}`, borderRadius: 14, padding: "18px 20px" }}>
-    <div style={{ display: "flex", gap: 8 }}>
-      {cards.map((c, i) => <Card key={i} card={c} w={86} frame={frame} delay={delay + i * 4} rise={44} />)}
-    </div>
-    <div style={{ fontSize: 25, color: tint, fontWeight: 600, letterSpacing: "0.06em" }}>{caption}</div>
-  </div>
-);
-
-export const S06Ratio: React.FC = () => {
+/* ============ 04 定義 ============ */
+export const S04Def: React.FC<SP> = ({ dur }) => {
   const frame = useCurrentFrame();
-  return (
-    <Stage gap={28}>
-      <Kicker delay={2}>理論上の正解</Kicker>
-      <Reveal delay={8}>
-        <div style={{ fontSize: 96, fontWeight: 700, display: "flex", alignItems: "center" }}>
-          <GradientText gradient={GRAD.gold} fontSize={96} weight={700} delay={10}>バリュー 2</GradientText>
-          <span style={{ color: C.muted, margin: "0 30px", fontWeight: 300 }}>:</span>
-          <GradientText gradient={GRAD.silver} fontSize={96} weight={700} delay={16}>ブラフ 1</GradientText>
-        </div>
-      </Reveal>
-      <div style={{ display: "flex", gap: 44, alignItems: "flex-start" }}>
-        <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-          <Combo cards={["Kd", "Kc"]} frame={frame} delay={26} tint={C.gold} caption="セット" />
-          <Combo cards={["9h", "9d"]} frame={frame} delay={34} tint={C.gold} caption="セット" />
-          <Combo cards={["As", "Js"]} frame={frame} delay={42} tint={C.silver} caption="空振りドロー" />
-        </div>
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 22, paddingTop: 6 }}>
-          <Bar label="相手の必要勝率" value={0.33} gradient={GRAD.silver} color={C.silver} delay={230} width={520} />
-          <Bar label="あなたのバリュー" value={0.66} gradient={GRAD.gold} color={C.gold} delay={280} width={520} />
-          <Bar label="あなたのブラフ" value={0.34} gradient={GRAD.silver} color={C.silver} delay={330} width={520} />
-        </div>
-      </div>
-      <Reveal delay={520}>
-        <div style={{ fontSize: 40, color: C.inkSoft, marginTop: 8, lineHeight: 1.5 }}>
-          三回に二回は<span style={{ color: C.gold, fontWeight: 600 }}>本物</span>、三回に一回は<span style={{ color: C.silver, fontWeight: 600 }}>ブラフ</span>。<span style={{ color: C.muted }}>これが理論上の正解。</span>
-        </div>
-      </Reveal>
-    </Stage>
-  );
-};
-
-/* ---------- 07 GTO vs エクスプロイト ---------- */
-const SlideIn: React.FC<{ from: "left" | "right"; delay: number; children: React.ReactNode; accent: string }> = ({
-  from, delay, children, accent,
-}) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const s = spring({ frame: frame - delay, fps, config: { damping: 200 } });
-  const x = interpolate(s, [0, 1], [from === "left" ? -110 : 110, 0]);
-  return (
-    <div style={{ flex: 1, opacity: interpolate(s, [0, 1], [0, 1]), transform: `translateX(${x}px)`, background: "linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012))", border: `1px solid ${accent}`, borderRadius: 18, padding: "38px 42px", backdropFilter: "blur(3px)" }}>
-      {children}
-    </div>
-  );
-};
-
-export const S07Exploit: React.FC = () => (
-  <Stage gap={34}>
-    <Kicker delay={2}>2つの戦略の関係</Kicker>
-    <div style={{ display: "flex", gap: 44 }}>
-      <SlideIn from="left" delay={8} accent="rgba(200,169,107,0.4)">
-        <div style={{ fontSize: 52, fontWeight: 700, color: C.gold, marginBottom: 22, letterSpacing: "0.02em" }}>GTO ・ 守り</div>
-        {["相手にどう動かれても搾取されない", "正しい「真ん中」＝基準", "相手が下手でも均衡を守るだけ"].map((t, i) => (
-          <div key={i} style={{ fontSize: 37, color: C.inkSoft, marginBottom: 16, fontWeight: 400 }}>— {t}</div>
-        ))}
-      </SlideIn>
-      <SlideIn from="right" delay={20} accent="rgba(169,175,179,0.4)">
-        <div style={{ fontSize: 52, fontWeight: 700, color: C.silver, marginBottom: 22, letterSpacing: "0.02em" }}>エクスプロイト ・ 攻め</div>
-        {["相手のミスを最大限とがめる", "ブラフ過多→コール増／降り過多→ブラフ増", "偏る＝自分にも隙が生まれる"].map((t, i) => (
-          <div key={i} style={{ fontSize: 37, color: C.inkSoft, marginBottom: 16, fontWeight: 400 }}>— {t}</div>
-        ))}
-      </SlideIn>
-    </div>
-    <Reveal delay={420}>
-      <div style={{ fontSize: 46, fontWeight: 500, textAlign: "center", color: C.inkSoft }}>
-        <span style={{ color: C.gold, fontWeight: 700 }}>まずGTOを土台に。</span>　そのうえで相手に応じて意図的にズラす。
-      </div>
-    </Reveal>
-  </Stage>
-);
-
-/* ---------- 08 ロードマップ ---------- */
-export const S08Roadmap: React.FC = () => {
-  const steps = [
-    ["01", "基礎理論", "EV・エクイティ・ポジション・レンジ"],
-    ["02", "プリフロップGTO", "オープン／3ベット／ディフェンス"],
-    ["03", "フロップ", "Cベット・ボード・レンジ優位"],
-    ["04", "ターン・リバー", "バレル・バリュー・無差別の深掘り"],
-    ["05", "応用", "エクスプロイト・ICM・上達法"],
-  ];
-  return (
-    <Stage gap={24}>
-      <Kicker delay={2}>シリーズ・ロードマップ ・ 全30回</Kicker>
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {steps.map((s, i) => (
-          <Reveal key={i} delay={10 + i * 12}>
-            <div style={{ display: "flex", alignItems: "center", gap: 34, padding: "20px 8px", borderBottom: `1px solid ${C.line}` }}>
-              <div style={{ fontFamily: LATIN, color: C.gold, fontWeight: 600, fontSize: 52, width: 96, letterSpacing: "0.02em" }}>{s[0]}</div>
-              <div style={{ fontSize: 42, fontWeight: 600 }}>{s[1]}</div>
-              <div style={{ fontSize: 30, color: C.muted, marginLeft: "auto" }}>{s[2]}</div>
-            </div>
-          </Reveal>
-        ))}
-      </div>
-    </Stage>
-  );
-};
-
-/* ---------- 09 まとめ＋次回 ---------- */
-export const S09Summary: React.FC = () => {
-  const points = [
-    ["GTO＝", "相手に搾取されない、均衡の戦略"],
-    ["均衡は", "バリュー:ブラフ比率に現れ、相手を無差別に"],
-    ["GTOは土台", "その上にエクスプロイト（応用）を乗せる"],
-  ];
-  return (
-    <Stage gap={36}>
-      <Kicker delay={2}>今日のまとめ</Kicker>
-      <div style={{ display: "flex", flexDirection: "column", gap: 34 }}>
-        {points.map((p, i) => (
-          <Reveal key={i} delay={20 + i * 60}>
-            <div style={{ display: "flex", alignItems: "center", gap: 30, fontSize: 46 }}>
-              <span style={{ width: 66, height: 66, borderRadius: "50%", border: `1.5px solid ${C.gold}`, color: C.gold, fontFamily: LATIN, fontWeight: 600, display: "grid", placeItems: "center", fontSize: 38, flex: "none" }}>{i + 1}</span>
-              <span style={{ color: C.inkSoft }}><span style={{ color: C.gold, fontWeight: 700 }}>{p[0]}</span>{p[1]}</span>
-            </div>
-          </Reveal>
-        ))}
-      </div>
-    </Stage>
-  );
-};
-
-/* ---------- シリーズ紹介 ---------- */
-export const SSeries: React.FC = () => (
-  <Stage gap={40}>
-    <Kicker delay={2}>このシリーズについて</Kicker>
-    <Reveal delay={10}>
-      <div style={{ fontSize: 82, fontWeight: 700, lineHeight: 1.25 }}>
-        全30回で、<GradientText gradient={GRAD.gold} fontSize={82} weight={700} delay={12}>基礎から</GradientText>体系的に。
-      </div>
-    </Reveal>
-    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-      {["感覚ではなく「なぜ正解か」を言葉にできるようになる", "専門用語も数式も、その都度かみ砕いて説明", "今日はその入口 —— GTOの全体像"].map((t, i) => (
-        <Reveal key={i} delay={30 + i * 12}>
-          <div style={{ display: "flex", alignItems: "center", gap: 22, fontSize: 42, color: C.inkSoft }}>
-            <span style={{ width: 10, height: 10, borderRadius: "50%", background: C.gold, flex: "none" }} />
-            {t}
-          </div>
-        </Reveal>
-      ))}
-    </div>
-  </Stage>
-);
-
-/* ---------- 搾取されない戦略 ---------- */
-export const SUnexploitable: React.FC = () => (
-  <Stage justify="center" gap={40}>
-    <Kicker delay={2}>ナッシュ均衡 ・ 一言でいうと</Kicker>
-    <Reveal delay={12}>
-      <div style={{ fontSize: 78, fontWeight: 700, lineHeight: 1.35 }}>
-        相手がどう動いても、<br />こちらは<span style={{ color: C.gold }}>戦略を変える必要がない</span>。
-      </div>
-    </Reveal>
-    <div><Stamp delay={200} fontSize={66}>＝ 搾取されない戦略</Stamp></div>
-    <Reveal delay={280}>
-      <div style={{ fontSize: 40, color: C.muted }}>攻めの必殺技ではなく、まず「鉄壁の守り」。</div>
-    </Reveal>
-  </Stage>
-);
-
-/* ---------- ポットオッズの導出 ---------- */
-const OddsRow: React.FC<{ delay: number; children: React.ReactNode }> = ({ delay, children }) => (
-  <Reveal delay={delay}>
-    <div style={{ fontSize: 52, color: C.inkSoft, fontWeight: 500, display: "flex", alignItems: "center", gap: 26, flexWrap: "wrap" }}>{children}</div>
-  </Reveal>
-);
-const Num: React.FC<{ children: React.ReactNode; c?: string }> = ({ children, c = C.ink }) => (
-  <span style={{ fontFamily: LATIN, fontSize: 66, fontWeight: 600, color: c }}>{children}</span>
-);
-export const SPotOdds: React.FC = () => (
-  <Stage gap={34}>
-    <Kicker delay={2}>なぜ「1/3」なのか ・ ポットオッズ</Kicker>
-    <OddsRow delay={12}>ポット <Num>100</Num> <span style={{ color: C.muted }}>＋</span> 相手のベット <Num>100</Num> <span style={{ color: C.muted }}>＝</span> <Num c={C.gold}>200</Num></OddsRow>
-    <OddsRow delay={150}>あなたのコール <Num>100</Num> <span style={{ color: C.muted, fontFamily: LATIN }}>→</span> 取りにいくのは <Num c={C.gold}>300</Num></OddsRow>
-    <Reveal delay={320}>
-      <div style={{ marginTop: 8, fontSize: 56, fontWeight: 600, display: "flex", alignItems: "center", gap: 24 }}>
-        必要勝率 <span style={{ color: C.muted, fontFamily: LATIN }}>=</span> <Num>100</Num><span style={{ color: C.muted }}>/</span><Num>300</Num> <span style={{ color: C.muted, fontFamily: LATIN }}>≒</span> <GradientText gradient={GRAD.gold} fontSize={80} weight={700} delay={320}>33%</GradientText>
-      </div>
-    </Reveal>
-    <Reveal delay={440}>
-      <div style={{ fontSize: 40, color: C.muted, marginTop: 6 }}>3回に1回でも勝てれば、コールは正当化される。</div>
-    </Reveal>
-  </Stage>
-);
-
-/* ---------- 無差別（インディファレンス） ---------- */
-export const SIndiff: React.FC = () => (
-  <Stage justify="center" gap={40}>
-    <Kicker delay={2}>均衡点 ・ インディファレンス</Kicker>
-    <Reveal delay={12}>
-      <div style={{ fontSize: 76, fontWeight: 700, lineHeight: 1.35 }}>
-        コールしても、降りても、<br /><GradientText gradient={GRAD.gold} fontSize={80} weight={700} delay={16}>期待値は同じ</GradientText>。
-      </div>
-    </Reveal>
-    <div><Stamp delay={220} fontSize={58}>無差別 ・ インディファレンス</Stamp></div>
-    <Reveal delay={300}>
-      <div style={{ fontSize: 40, color: C.muted, lineHeight: 1.5 }}>
-        相手はあなたのベットから、もう利益を絞り取れない。<br />じゃんけんで1/3ずつに散らすのと、同じ発想。
-      </div>
-    </Reveal>
-  </Stage>
-);
-
-/* ---------- 土台と応用 ---------- */
-export const SFoundation: React.FC = () => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const box = (delay: number, w: number, accent: string, title: string, sub: string, tcol: string) => {
-    const s = spring({ frame: frame - delay, fps, config: { damping: 200 } });
-    return (
-      <div style={{ width: w, maxWidth: "90%", opacity: interpolate(s, [0, 1], [0, 1]), transform: `translateY(${interpolate(s, [0, 1], [24, 0])}px)`, background: "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015))", border: `1px solid ${accent}`, borderRadius: 16, padding: "26px 40px", textAlign: "center" }}>
-        <div style={{ fontSize: 46, fontWeight: 700, color: tcol }}>{title}</div>
-        <div style={{ fontSize: 30, color: C.muted, marginTop: 6 }}>{sub}</div>
-      </div>
-    );
-  };
-  return (
-    <Stage justify="center" gap={22}>
-      <Kicker delay={2}>順番が大切</Kicker>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 18, marginTop: 10 }}>
-        {box(120, 900, "rgba(169,175,179,0.45)", "エクスプロイト ・ 応用", "相手に合わせて攻める（隙も生まれる）", C.silver)}
-        {box(20, 1180, "rgba(200,169,107,0.5)", "GTO ・ 土台", "誰にも搾取されない、正しい基準", C.gold)}
-      </div>
-      <Reveal delay={280}>
-        <div style={{ fontSize: 40, color: C.inkSoft, marginTop: 18, textAlign: "center" }}>
-          まず<span style={{ color: C.gold, fontWeight: 600 }}>土台</span>を知る。その上で、相手に応じてズラす。
-        </div>
-      </Reveal>
-    </Stage>
-  );
-};
-
-/* ---------- なぜ今GTO：解かれた歴史 ---------- */
-export const SSolved: React.FC = () => {
-  const items = [
-    ["2015", "Cepheus", "リミット・ヘッズアップを事実上「解決」"],
-    ["2017", "Libratus", "ノーリミットHUでトッププロに勝利"],
-    ["2019", "Pluribus", "6人制でトッププロに勝利"],
-  ];
-  return (
-    <Stage gap={26}>
-      <Kicker delay={2}>なぜ今 ・ GTOは「共通言語」</Kicker>
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        {items.map((it, i) => (
-          <Reveal key={i} delay={16 + i * 60}>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 34, padding: "16px 8px", borderBottom: `1px solid ${C.line}` }}>
-              <div style={{ fontFamily: LATIN, fontSize: 60, fontWeight: 600, color: C.gold, width: 160 }}>{it[0]}</div>
-              <div style={{ fontFamily: LATIN, fontSize: 46, fontWeight: 600, color: C.ink, width: 260 }}>{it[1]}</div>
-              <div style={{ fontSize: 34, color: C.muted }}>{it[2]}</div>
-            </div>
-          </Reveal>
-        ))}
-      </div>
-      <Reveal delay={280}>
-        <div style={{ fontSize: 48, fontWeight: 600, marginTop: 10 }}>
-          GTOは、現代ポーカーの<span style={{ color: C.gold }}>共通言語</span>。
-        </div>
-      </Reveal>
-    </Stage>
-  );
-};
-
-/* ---------- レンジで考える ---------- */
-export const SRanges: React.FC = () => {
-  const frame = useCurrentFrame();
-  const range = ["Ah", "Ks", "Qd", "Jc", "Ts", "9h"];
+  const F = (x: number) => Math.round(x * dur);
+  const gto = ["G", "T", "O"];
   return (
     <Stage gap={40}>
+      <Kicker delay={2}>GTO とは</Kicker>
+      <div style={{ fontFamily: LATIN, fontSize: 120, fontWeight: 600, letterSpacing: "0.02em" }}>
+        {"Game Theory Optimal".split(" ").map((w, i) => (
+          <Reveal key={i} delay={F(0.05) + i * 10} style={{ display: "inline-block", marginRight: 26 }}>
+            <span style={{ color: gto.includes(w[0]) ? C.gold : C.ink, transform: `scale(${1 + 0.03 * pulse(frame, 0.14, i)})`, display: "inline-block" }}>{w}</span>
+          </Reveal>
+        ))}
+      </div>
+      <div style={{ marginTop: 16 }}><Stamp delay={F(0.5)} fontSize={66}>＝ 搾取されない戦略</Stamp></div>
+    </Stage>
+  );
+};
+
+/* ============ 05 盾（搾取されない） ============ */
+export const S05Shield: React.FC<SP> = () => {
+  const frame = useCurrentFrame();
+  const R = 470;
+  const attackers = Array.from({ length: 8 });
+  return (
+    <AbsoluteFill style={{ fontFamily: FONT }}>
+      <Kicker delay={2}>ナッシュ均衡 ・ 搾取されない</Kicker>
+      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
+        <div style={{ position: "relative", width: 2 * R, height: 2 * R }}>
+          {attackers.map((_, k) => {
+            const ang = (k / attackers.length) * Math.PI * 2 + frame * 0.004;
+            const period = 46; const p = ((frame + k * 6) % period) / period;
+            const dist = interpolate(p, [0, 0.44, 0.5, 1], [R, 175, 175, R]);
+            const op = interpolate(p, [0, 0.08, 0.5, 0.9, 1], [0, 1, 1, 0.6, 0]);
+            const x = R + Math.cos(ang) * dist, y = R + Math.sin(ang) * dist;
+            return <div key={k} style={{ position: "absolute", left: x - 22, top: y - 22, opacity: op }}><Chip size={44} /></div>;
+          })}
+          <div style={{ position: "absolute", left: R - 150, top: R - 150, width: 300, height: 300, borderRadius: "50%", transform: `scale(${1 + 0.04 * pulse(frame, 0.18)})`, background: "radial-gradient(circle at 50% 40%, rgba(200,169,107,0.16), rgba(0,0,0,0.2) 70%)", border: `2px solid ${C.gold}`, boxShadow: `0 0 60px rgba(200,169,107,${0.3 + 0.2 * pulse(frame, 0.18)})`, display: "grid", placeItems: "center" }}>
+            <span style={{ fontFamily: LATIN, fontSize: 92, fontWeight: 600, color: C.goldSoft }}>GTO</span>
+          </div>
+        </div>
+      </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};
+
+/* ============ 06 じゃんけん（激しく循環） ============ */
+export const S06Janken: React.FC<SP> = () => {
+  const frame = useCurrentFrame();
+  const hands = ["グー", "チョキ", "パー"];
+  const cur = Math.floor(frame / 7) % 3;
+  const cols = [C.ink, C.gold, C.silver];
+  const seg = 120;
+  return (
+    <Stage gap={40}>
+      <Kicker delay={2}>直感例 I ・ じゃんけん</Kicker>
+      <div style={{ display: "flex", alignItems: "center", gap: 90 }}>
+        <div style={{ position: "relative", width: 340, height: 340 }}>
+          <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: `conic-gradient(${C.ink} 0 ${seg}deg, ${C.gold} ${seg}deg ${2 * seg}deg, ${C.silver} ${2 * seg}deg 360deg)`, transform: `rotate(${frame * 0.4}deg)`, boxShadow: "0 0 0 1px rgba(255,255,255,0.12)" }} />
+          <div style={{ position: "absolute", inset: "28%", borderRadius: "50%", background: C.bg, display: "grid", placeItems: "center", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.14)" }}>
+            <span style={{ fontSize: 44, fontWeight: 700, color: cols[cur], transform: `scale(${1 + 0.08 * pulse(frame, 0.9)})` }}>{hands[cur]}</span>
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+          {hands.map((h, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 20, fontSize: 46, fontWeight: 600, opacity: cur === i ? 1 : 0.4 }}>
+              <span style={{ width: 32, height: 32, borderRadius: 6, background: cols[i] }} />
+              {h}<span style={{ fontFamily: LATIN, color: C.muted, marginLeft: 8 }}>1/3</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <Reveal delay={20}><div style={{ fontSize: 44, fontWeight: 600 }}>均衡 <span style={{ color: C.muted, fontSize: 34 }}>＝ 誰にも打ち負かされない</span></div></Reveal>
+    </Stage>
+  );
+};
+
+/* ============ 07 偏り→搾取 ============ */
+export const S07Bias: React.FC<SP> = ({ dur }) => {
+  const frame = useCurrentFrame();
+  const F = (x: number) => Math.round(x * dur);
+  const you = interpolate(frame, [F(0.05), F(0.4)], [0.33, 0.62], clamp);
+  const opp = interpolate(frame, [F(0.3), F(0.7)], [0.33, 0.72], clamp);
+  return (
+    <Stage gap={40}>
+      <Kicker delay={2}>偏りは搾取される</Kicker>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 120, height: 340, position: "relative" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+          <div style={{ width: 150, height: 300 * you, background: GRAD.gold, borderRadius: 12 }} />
+          <div style={{ fontSize: 34, color: C.gold, fontWeight: 600 }}>あなた（グー多め）</div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+          <div style={{ width: 150, height: 300 * opp, background: GRAD.silver, borderRadius: 12 }} />
+          <div style={{ fontSize: 34, color: C.silver, fontWeight: 600 }}>相手（パー増）</div>
+        </div>
+        {[0, 1, 2, 3, 4].map((k) => {
+          const p = ((frame + k * 18) % 90) / 90;
+          return <div key={k} style={{ position: "absolute", left: interpolate(p, [0, 1], [150, 470]), top: interpolate(p, [0, 0.5, 1], [-40, -90, -40]), opacity: interpolate(p, [0, 0.1, 0.9, 1], [0, 1, 1, 0]) }}><Chip size={40} gold /></div>;
+        })}
+      </div>
+      <Reveal delay={10}><div style={{ fontSize: 64, fontWeight: 700 }}><span style={{ color: C.gold }}>偏り</span> <span style={{ color: C.muted, fontFamily: LATIN }}>→</span> <span style={{ color: C.silver }}>搾取される</span></div></Reveal>
+    </Stage>
+  );
+};
+
+/* ============ 08 リバー ============ */
+export const S08River: React.FC<SP> = ({ dur }) => {
+  const frame = useCurrentFrame();
+  const F = (x: number) => Math.round(x * dur);
+  const board = ["Ks", "9s", "4d", "7h", "2d"];
+  const hero = ["Kh", "Qc"];
+  const betS = spring({ frame: frame - F(0.45), fps: 30, config: { damping: 200 } });
+  return (
+    <Stage gap={30}>
+      <Kicker delay={2}>直感例 II ・ リバー</Kicker>
+      <div><div style={{ fontSize: 28, color: C.muted, letterSpacing: "0.18em", marginBottom: 12 }}>BOARD</div>
+        <CardRow cards={board} w={150} frame={frame} startDelay={F(0.04)} stagger={6} /></div>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 60 }}>
+        <div><div style={{ fontSize: 28, color: C.gold, letterSpacing: "0.12em", marginBottom: 12, fontWeight: 600 }}>あなた ・ ブラフキャッチャー</div>
+          <CardRow cards={hero} w={150} frame={frame} startDelay={F(0.28)} stagger={6} ring={C.gold} /></div>
+        <div style={{ display: "flex", alignItems: "center", gap: 20, opacity: interpolate(betS, [0, 1], [0, 1]), transform: `translateY(${interpolate(betS, [0, 1], [30, 0]) + osc(frame, 0.06) * 4}px)` }}>
+          <ChipStack n={5} size={88} gold />
+          <div style={{ fontSize: 34, color: C.inkSoft }}><span style={{ color: C.gold, fontWeight: 700 }}>ポットと同額</span>ベット</div>
+        </div>
+      </div>
+      <Reveal delay={F(0.78)}><div style={{ fontSize: 58, fontWeight: 700 }}><span style={{ color: C.gold }}>コール？</span> <span style={{ color: C.muted }}>／</span> <span style={{ color: C.silver }}>降りる？</span></div></Reveal>
+    </Stage>
+  );
+};
+
+/* ============ 09 ポットオッズ（3つの100が集まり→1/3=33%） ============ */
+export const S09PotOdds: React.FC<SP> = ({ dur }) => {
+  const frame = useCurrentFrame();
+  const F = (x: number) => Math.round(x * dur);
+  const t = [F(0.1), F(0.3), F(0.5)];               // ポット/ベット/コール が現れる
+  const count = t.filter((tt) => frame >= tt).length;
+  const total = count * 100;
+  const hi = interpolate(frame, [F(0.62), F(0.72)], [0, 1], clamp);        // 1/3 を強調
+  const pct = spring({ frame: frame - F(0.72), fps: 30, config: { damping: 200 } });
+  const labels = ["ポット 100", "＋ ベット 100", "＋ コール 100"];
+  return (
+    <Stage gap={26}>
+      <Kicker delay={2}>なぜ「1/3」なのか ・ ポットオッズ</Kicker>
+      <div style={{ height: 60 }}>
+        {count > 0 && <div style={{ fontFamily: LATIN, fontSize: 64, fontWeight: 600, color: C.gold }}>= {total}</div>}
+      </div>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 70, height: 260 }}>
+        {[0, 1, 2].map((k) => {
+          const s = spring({ frame: frame - t[k], fps: 30, config: { damping: 14, stiffness: 120 } });
+          const highlight = k === 0 && hi > 0.2;
+          return (
+            <div key={k} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14, opacity: interpolate(s, [0, 1], [0, 1]), transform: `translateY(${interpolate(s, [0, 1], [40, 0])}px)` }}>
+              <ChipStack n={5} size={82} gold={highlight} />
+              <div style={{ fontSize: 26, color: highlight ? C.gold : C.muted, fontWeight: 600 }}>{highlight ? "これが 1/3" : labels[k]}</div>
+            </div>
+          );
+        })}
+        <div style={{ display: "flex", alignItems: "center", gap: 20, marginLeft: 40, opacity: interpolate(pct, [0, 1], [0, 1]), transform: `scale(${interpolate(pct, [0, 1], [0.7, 1])})` }}>
+          <span style={{ fontSize: 40, color: C.inkSoft }}>必要勝率</span>
+          <GradientText gradient={GRAD.gold} fontSize={96} weight={700} delay={F(0.72)}>33%</GradientText>
+        </div>
+      </div>
+    </Stage>
+  );
+};
+
+/* ============ 10 比率（2:1に仕分け） ============ */
+export const S10Ratio: React.FC<SP> = ({ dur }) => {
+  const frame = useCurrentFrame();
+  const F = (x: number) => Math.round(x * dur);
+  const barS = spring({ frame: frame - F(0.62), fps: 30, config: { damping: 200 } });
+  return (
+    <Stage gap={40}>
+      <Kicker delay={2}>理論上の正解</Kicker>
+      <div style={{ display: "flex", alignItems: "center", gap: 50, fontSize: 90, fontWeight: 700 }}>
+        <GradientText gradient={GRAD.gold} fontSize={90} weight={700} delay={F(0.06)}>バリュー 2</GradientText>
+        <span style={{ color: C.muted, fontFamily: LATIN }}>:</span>
+        <GradientText gradient={GRAD.silver} fontSize={90} weight={700} delay={F(0.14)}>ブラフ 1</GradientText>
+      </div>
+      <div style={{ display: "flex", gap: 60, alignItems: "flex-start" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+          <div style={{ display: "flex", gap: 30 }}>
+            <div style={{ display: "flex", gap: 10 }}>{["Kd", "Kc"].map((c, i) => <Card key={i} card={c} w={104} frame={frame} delay={F(0.2) + i * 4} rise={40} />)}</div>
+            <div style={{ display: "flex", gap: 10 }}>{["9h", "9d"].map((c, i) => <Card key={i} card={c} w={104} frame={frame} delay={F(0.32) + i * 4} rise={40} />)}</div>
+          </div>
+          <div style={{ fontSize: 30, color: C.gold, fontWeight: 600, letterSpacing: "0.08em" }}>バリュー（本物）</div>
+        </div>
+        <div style={{ width: 1, alignSelf: "stretch", background: C.line }} />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+          <div style={{ display: "flex", gap: 10 }}>{["As", "Js"].map((c, i) => <Card key={i} card={c} w={104} frame={frame} delay={F(0.46) + i * 4} rise={40} />)}</div>
+          <div style={{ fontSize: 30, color: C.silver, fontWeight: 600, letterSpacing: "0.08em" }}>ブラフ</div>
+        </div>
+      </div>
+      <div style={{ display: "flex", width: 900, height: 26, borderRadius: 13, overflow: "hidden", border: `1px solid ${C.line}` }}>
+        <div style={{ width: `${interpolate(barS, [0, 1], [0, 66.6])}%`, background: GRAD.gold }} />
+        <div style={{ flex: 1, background: GRAD.silver }} />
+      </div>
+    </Stage>
+  );
+};
+
+/* ============ 11 無差別（天秤） ============ */
+export const S11Indiff: React.FC<SP> = ({ dur }) => {
+  const frame = useCurrentFrame();
+  const F = (x: number) => Math.round(x * dur);
+  const settle = Math.max(0, 1 - frame / F(0.45));
+  const ang = osc(frame, 0.06) * 6 * settle + osc(frame, 0.03) * 1.2; // 揺れて水平へ、以後わずかに
+  const pan = (label: string, side: number) => (
+    <div style={{ position: "absolute", left: 450 + side * 250 - 90, top: 100 + side * ang * 3.2, display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div style={{ width: 3, height: 64, background: C.line }} />
+      <div style={{ width: 180, height: 74, borderRadius: "0 0 90px 90px", border: `2px solid ${C.gold}`, borderTop: "none", background: "rgba(200,169,107,0.08)", display: "grid", placeItems: "center", color: C.ink, fontSize: 34, fontWeight: 600 }}>{label}</div>
+    </div>
+  );
+  return (
+    <Stage gap={30}>
+      <Kicker delay={2}>均衡点 ・ インディファレンス</Kicker>
+      <div style={{ position: "relative", width: 900, height: 300, margin: "10px auto 0" }}>
+        <div style={{ position: "absolute", left: 450 - 4, top: 54, width: 8, height: 190, background: C.line }} />
+        <div style={{ position: "absolute", left: 450 - 70, bottom: 10, width: 140, height: 16, borderRadius: 6, background: C.line }} />
+        <div style={{ position: "absolute", left: 450 - 250, top: 90, width: 500, height: 8, background: GRAD.gold, borderRadius: 4, transform: `rotate(${ang}deg)`, transformOrigin: "center" }} />
+        {pan("コール", -1)}
+        {pan("降りる", 1)}
+      </div>
+      <div style={{ textAlign: "center" }}><Stamp delay={F(0.2)} fontSize={58}>無差別 ・ EV は同じ</Stamp></div>
+    </Stage>
+  );
+};
+
+/* ============ 12 レンジ ============ */
+export const S12Ranges: React.FC<SP> = ({ dur }) => {
+  const frame = useCurrentFrame();
+  const F = (x: number) => Math.round(x * dur);
+  const range = ["Ah", "Ks", "Qd", "Jc", "Ts", "9h"];
+  return (
+    <Stage gap={44}>
       <Kicker delay={2}>GTOの思考法 ・ レンジで考える</Kicker>
       <div style={{ display: "flex", alignItems: "center", gap: 80 }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
-          <Reveal delay={16}><div style={{ fontSize: 32, color: C.silver, letterSpacing: "0.1em" }}>「この1手」と決めつける</div></Reveal>
-          <Card card="Kh" w={128} frame={frame} delay={20} rise={60} dim />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+          <div style={{ fontSize: 30, color: C.silver }}>1つに決めつけ</div>
+          <Card card="Kh" w={128} frame={frame} delay={F(0.08)} rise={40} dim />
         </div>
-        <Reveal delay={120}><div style={{ fontFamily: LATIN, fontSize: 70, color: C.muted }}>→</div></Reveal>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 20 }}>
-          <Reveal delay={150}><div style={{ fontSize: 34, color: C.gold, letterSpacing: "0.1em", fontWeight: 600 }}>ありえる「範囲」で考える</div></Reveal>
+        <div style={{ fontFamily: LATIN, fontSize: 74, color: C.muted, transform: `translateX(${osc(frame, 0.1) * 6}px)` }}>→</div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+          <div style={{ fontSize: 32, color: C.gold, fontWeight: 600 }}>ありえる「範囲」</div>
           <div style={{ display: "flex" }}>
             {range.map((c, i) => (
-              <div key={i} style={{ margin: "0 -18px", transform: `rotate(${(i - 2.5) * 6}deg)` }}>
-                <Card card={c} w={122} frame={frame} delay={160 + i * 6} rise={70} />
+              <div key={i} style={{ margin: "0 -16px", transform: `rotate(${(i - 2.5) * 7}deg) translateY(${osc(frame, 0.06, i) * 4}px)` }}>
+                <Card card={c} w={116} frame={frame} delay={F(0.35) + i * 6} rise={70} />
               </div>
             ))}
           </div>
         </div>
       </div>
-      <Reveal delay={430}>
-        <div style={{ fontSize: 42, color: C.inkSoft, marginTop: 20 }}>
-          レンジ全体の<span style={{ color: C.gold, fontWeight: 600 }}>バランス</span>こそが、勝敗を分ける。
-        </div>
-      </Reveal>
     </Stage>
   );
 };
 
-/* ---------- 次回予告＋CTA ---------- */
-export const SNext: React.FC = () => (
-  <Stage justify="center" gap={38}>
-    <Kicker delay={2}>次回予告</Kicker>
-    <Reveal delay={10}>
-      <div style={{ fontSize: 58, fontWeight: 600, color: C.inkSoft }}>
-        第2回　<GradientText gradient={GRAD.gold} fontSize={92} weight={700} delay={14}>期待値（EV）</GradientText>
+/* ============ 13 GTO vs エクスプロイト（振り子） ============ */
+export const S13Exploit: React.FC<SP> = () => {
+  const frame = useCurrentFrame();
+  const sw = osc(frame, 0.05) * 26;
+  const panel = (title: string, sub: string, col: string) => (
+    <div style={{ flex: 1, background: "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.012))", border: `1px solid ${col}66`, borderRadius: 18, padding: "34px 40px", textAlign: "center" }}>
+      <div style={{ fontSize: 50, fontWeight: 700, color: col, marginBottom: 10 }}>{title}</div>
+      <div style={{ fontSize: 34, color: C.muted }}>{sub}</div>
+    </div>
+  );
+  return (
+    <Stage gap={30}>
+      <Kicker delay={2}>2つの戦略</Kicker>
+      <div style={{ position: "relative", height: 90 }}>
+        <div style={{ position: "absolute", left: "50%", top: 0, width: 2, height: 40, background: C.line, transform: `translateX(-50%) rotate(${sw}deg)`, transformOrigin: "top center" }} />
+        <div style={{ position: "absolute", left: `calc(50% + ${Math.sin((sw * Math.PI) / 180) * 40}px)`, top: 34, transform: "translateX(-50%)" }}><Chip size={40} gold /></div>
       </div>
-    </Reveal>
-    <Reveal delay={40}>
-      <div style={{ fontSize: 40, color: C.muted, lineHeight: 1.5 }}>
-        すべての判断を貫く、たった一つの物差し。<br />「正しく打ったのに負けた」も、ここで晴れる。
+      <div style={{ display: "flex", gap: 44 }}>
+        <Reveal delay={8} style={{ flex: 1 }}>{panel("GTO ・ 守り", "搾取されない基準", C.gold)}</Reveal>
+        <Reveal delay={16} style={{ flex: 1 }}>{panel("エクスプロイト ・ 攻め", "相手のミスを突く", C.silver)}</Reveal>
       </div>
-    </Reveal>
-    <div style={{ marginTop: 8 }}><Stamp delay={200} fontSize={50} color={C.gold}>チャンネル登録をお願いします</Stamp></div>
+    </Stage>
+  );
+};
+
+/* ============ 14 土台と応用 ============ */
+export const S14Foundation: React.FC<SP> = ({ dur }) => {
+  const frame = useCurrentFrame();
+  const F = (x: number) => Math.round(x * dur);
+  const drop = spring({ frame: frame - F(0.4), fps: 30, config: { damping: 12, stiffness: 120 } });
+  return (
+    <Stage justify="center" gap={20}>
+      <Kicker delay={2}>順番が大切</Kicker>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, marginTop: 20, transform: `translateY(${osc(frame, 0.05) * 4}px)` }}>
+        <div style={{ width: 760, padding: "24px", borderRadius: 14, background: "linear-gradient(180deg, rgba(169,175,179,0.14), rgba(169,175,179,0.04))", border: `1px solid ${C.silver}66`, textAlign: "center", opacity: interpolate(drop, [0, 1], [0, 1]), transform: `translateY(${interpolate(drop, [0, 1], [-120, 0])}px)` }}>
+          <span style={{ fontSize: 46, fontWeight: 700, color: C.silver }}>エクスプロイト ・ 応用</span>
+        </div>
+        <div style={{ width: 1080, padding: "30px", borderRadius: 14, background: "linear-gradient(180deg, rgba(200,169,107,0.16), rgba(200,169,107,0.05))", border: `1px solid ${C.gold}`, textAlign: "center" }}>
+          <span style={{ fontSize: 52, fontWeight: 700, color: C.gold }}>GTO ・ 土台</span>
+        </div>
+      </div>
+    </Stage>
+  );
+};
+
+/* ============ 15 なぜ今（AI ▶ PRO） ============ */
+export const S15Solved: React.FC<SP> = ({ dur }) => {
+  const frame = useCurrentFrame();
+  const F = (x: number) => Math.round(x * dur);
+  const rows = [["2015", "Cepheus"], ["2017", "Libratus"], ["2019", "Pluribus"]];
+  return (
+    <Stage gap={26}>
+      <Kicker delay={2}>なぜ今 ・ GTOは共通言語</Kicker>
+      <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+        {rows.map((r, i) => {
+          const s = spring({ frame: frame - F(0.12 + i * 0.18), fps: 30, config: { damping: 18 } });
+          return (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: 30, opacity: interpolate(s, [0, 1], [0, 1]), transform: `translateX(${interpolate(s, [0, 1], [-60, 0])}px)` }}>
+              <span style={{ fontFamily: LATIN, fontSize: 58, fontWeight: 600, color: C.gold, width: 150 }}>{r[0]}</span>
+              <span style={{ fontFamily: LATIN, fontSize: 44, fontWeight: 600, width: 240 }}>{r[1]}</span>
+              <span style={{ fontSize: 40, fontWeight: 700, color: C.silver }}>AI</span>
+              <span style={{ fontFamily: LATIN, fontSize: 40, color: C.gold, transform: `scale(${1 + 0.15 * pulse(frame, 0.3, i)})` }}>▶</span>
+              <span style={{ fontSize: 34, color: C.muted }}>トッププロに勝利</span>
+            </div>
+          );
+        })}
+      </div>
+      <Reveal delay={F(0.7)}><div style={{ fontSize: 56, fontWeight: 700 }}>GTO <span style={{ color: C.muted, fontSize: 40 }}>＝</span> <span style={{ color: C.gold }}>現代の共通言語</span></div></Reveal>
+    </Stage>
+  );
+};
+
+/* ============ 16 まとめ（モンタージュ） ============ */
+export const S16Summary: React.FC<SP> = ({ dur }) => {
+  const frame = useCurrentFrame();
+  const F = (x: number) => Math.round(x * dur);
+  const items = [
+    { k: "均衡", d: "搾取されない", col: C.ink },
+    { k: "2 : 1", d: "バリュー:ブラフ", col: C.gold },
+    { k: "土台", d: "その上に応用", col: C.silver },
+  ];
+  return (
+    <Stage gap={50}>
+      <Kicker delay={2}>今日のまとめ</Kicker>
+      <div style={{ display: "flex", gap: 50, justifyContent: "center" }}>
+        {items.map((it, i) => {
+          const s = spring({ frame: frame - F(0.12 + i * 0.22), fps: 30, config: { damping: 12, stiffness: 130 } });
+          return (
+            <div key={i} style={{ flex: 1, textAlign: "center", opacity: interpolate(s, [0, 1], [0, 1]), transform: `scale(${interpolate(s, [0, 1], [0.7, 1])}) translateY(${osc(frame, 0.05, i) * 5}px)` }}>
+              <div style={{ fontFamily: LATIN, fontSize: 84, fontWeight: 700, color: it.col }}>{i + 1}</div>
+              <div style={{ fontSize: 60, fontWeight: 700, color: it.col, margin: "6px 0" }}>{it.k}</div>
+              <div style={{ fontSize: 34, color: C.muted }}>{it.d}</div>
+            </div>
+          );
+        })}
+      </div>
+    </Stage>
+  );
+};
+
+/* ============ 17 次回 ============ */
+export const S17Next: React.FC<SP> = () => (
+  <Stage justify="center" gap={40}>
+    <Kicker delay={2}>次回</Kicker>
+    <div style={{ fontSize: 56, fontWeight: 600, color: C.inkSoft }}>
+      第2回　<GradientText gradient={GRAD.gold} fontSize={94} weight={700} delay={12}>期待値（EV）</GradientText>
+    </div>
+    <div style={{ marginTop: 10 }}><Stamp delay={60} fontSize={52} color={C.gold}>チャンネル登録をお願いします</Stamp></div>
   </Stage>
 );
 
-export const SCENES: Record<string, React.FC> = {
-  title: S01Title,
-  hook: S02Hook,
-  series: SSeries,
-  def: S03Def,
-  unexploitable: SUnexploitable,
-  janken: S04Janken,
-  jankenExploit: SJankenExploit,
-  river: S05River,
-  potodds: SPotOdds,
-  ratio: S06Ratio,
-  indiff: SIndiff,
-  ranges: SRanges,
-  exploit: S07Exploit,
-  foundation: SFoundation,
-  solved: SSolved,
-  roadmap: S08Roadmap,
-  summary: S09Summary,
-  next: SNext,
+export const SCENES: Record<string, React.FC<SP>> = {
+  title: S01Title, hook: S02Hook, series: S03Series, def: S04Def, unexploitable: S05Shield,
+  janken: S06Janken, jankenExploit: S07Bias, river: S08River, potodds: S09PotOdds, ratio: S10Ratio,
+  indiff: S11Indiff, ranges: S12Ranges, exploit: S13Exploit, foundation: S14Foundation, solved: S15Solved,
+  summary: S16Summary, next: S17Next,
 };

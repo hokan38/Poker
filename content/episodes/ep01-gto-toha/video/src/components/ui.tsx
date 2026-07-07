@@ -173,6 +173,32 @@ export const Panel: React.FC<{ children: React.ReactNode; style?: React.CSSPrope
   </div>
 );
 
+/** ナレーション字幕（シーン先頭基準のフレームで切り替え）。 */
+export const Subtitles: React.FC<{ captions?: { t: string; from: number; to: number }[] }> = ({ captions }) => {
+  const frame = useCurrentFrame();
+  if (!captions || captions.length === 0) return null;
+  const active = captions.find((c) => frame >= c.from && frame < c.to);
+  if (!active) return null;
+  const local = frame - active.from;
+  const len = active.to - active.from;
+  const op = Math.min(
+    interpolate(local, [0, 5], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+    interpolate(local, [len - 6, len], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })
+  );
+  return (
+    <div style={{ position: "absolute", left: 0, right: 0, bottom: 96, display: "flex", justifyContent: "center", pointerEvents: "none" }}>
+      <div style={{
+        opacity: op, maxWidth: 1440, textAlign: "center", fontFamily: FONT,
+        fontSize: 42, fontWeight: 500, color: C.ink, lineHeight: 1.4,
+        letterSpacing: "0.02em", padding: "12px 34px", borderRadius: 12,
+        background: "rgba(6,6,8,0.6)", backdropFilter: "blur(6px)",
+        boxShadow: "0 8px 30px rgba(0,0,0,0.45)", border: "1px solid rgba(255,255,255,0.08)",
+        textShadow: "0 2px 10px rgba(0,0,0,0.6)",
+      }}>{active.t}</div>
+    </div>
+  );
+};
+
 /** 細い水平罫（区切り）。 */
 export const Rule: React.FC<{ delay?: number; width?: number; color?: string }> = ({ delay = 0, width = 200, color = C.line }) => {
   const frame = useCurrentFrame();

@@ -16,6 +16,7 @@
 import json
 import math
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -30,6 +31,33 @@ LINES = HERE / "narration" / "lines.json"
 PUB = HERE / "public" / "narration"
 MANIFEST = HERE / "src" / "manifest.json"
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
+
+MIN_CHARS = 12   # 字幕1枚の最小文字数の目安
+
+
+def make_captions(text, audio_frames, lead_in, fps):
+    """ナレーションを句読点で区切り、文字数に比例して時間割りした字幕を作る。
+    返り値: [{"t": 表示文, "from": フレーム, "to": フレーム}]（シーン先頭基準）。"""
+    tokens = re.findall(r"[^、。！？]+[、。！？]?", text)
+    chunks, cur = [], ""
+    for tok in tokens:
+        cur += tok
+        if len(cur) >= MIN_CHARS or tok.endswith(("。", "！", "？")):
+            chunks.append(cur)
+            cur = ""
+    if cur:
+        chunks.append(cur)
+    # 表示は末尾の読点を除いて整える
+    disp = [c.rstrip("、") for c in chunks]
+    total_chars = sum(len(c) for c in chunks) or 1
+    caps, acc = [], lead_in
+    for c, d in zip(chunks, disp):
+        dur = max(int(round(len(c) / total_chars * audio_frames)), 8)
+        caps.append({"t": d, "from": acc, "to": acc + dur})
+        acc += dur
+    if caps:  # 最後は音声終端に合わせる
+        caps[-1]["to"] = lead_in + audio_frames
+    return caps
 
 
 def main() -> int:
@@ -77,6 +105,7 @@ def main() -> int:
             "audioFrames": audio_frames,
             "leadInFrames": lead_in,
             "durationInFrames": dur_frames,
+            "captions": make_captions(text, audio_frames, lead_in, fps),
         })
         print(f"  scene {i:02d} {sid:8s}  {audio_sec:5.2f}s  -> {dur_frames} frames")
 
