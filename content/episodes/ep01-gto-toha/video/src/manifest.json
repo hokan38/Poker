@@ -2,89 +2,170 @@
   "fps": 30,
   "leadInFrames": 12,
   "tailFrames": 26,
-  "totalFrames": 5731,
-  "totalSec": 191.03,
+  "totalFrames": 18975,
+  "totalSec": 632.5,
   "scenes": [
     {
       "id": "title",
       "index": 1,
       "file": "scene-01-title.mp3",
-      "audioSec": 9.565,
-      "audioFrames": 287,
+      "audioSec": 11.065,
+      "audioFrames": 332,
       "leadInFrames": 12,
-      "durationInFrames": 325
+      "durationInFrames": 370
     },
     {
       "id": "hook",
       "index": 2,
       "file": "scene-02-hook.mp3",
-      "audioSec": 17.285,
-      "audioFrames": 519,
+      "audioSec": 45.9,
+      "audioFrames": 1377,
       "leadInFrames": 12,
-      "durationInFrames": 557
+      "durationInFrames": 1415
+    },
+    {
+      "id": "series",
+      "index": 3,
+      "file": "scene-03-series.mp3",
+      "audioSec": 25.22,
+      "audioFrames": 757,
+      "leadInFrames": 12,
+      "durationInFrames": 795
     },
     {
       "id": "def",
-      "index": 3,
-      "file": "scene-03-def.mp3",
-      "audioSec": 13.73,
-      "audioFrames": 412,
+      "index": 4,
+      "file": "scene-04-def.mp3",
+      "audioSec": 34.81,
+      "audioFrames": 1045,
       "leadInFrames": 12,
-      "durationInFrames": 450
+      "durationInFrames": 1083
+    },
+    {
+      "id": "unexploitable",
+      "index": 5,
+      "file": "scene-05-unexploitable.mp3",
+      "audioSec": 31.7,
+      "audioFrames": 951,
+      "leadInFrames": 12,
+      "durationInFrames": 989
     },
     {
       "id": "janken",
-      "index": 4,
-      "file": "scene-04-janken.mp3",
-      "audioSec": 26.19,
-      "audioFrames": 786,
+      "index": 6,
+      "file": "scene-06-janken.mp3",
+      "audioSec": 33.525,
+      "audioFrames": 1006,
       "leadInFrames": 12,
-      "durationInFrames": 824
+      "durationInFrames": 1044
+    },
+    {
+      "id": "jankenExploit",
+      "index": 7,
+      "file": "scene-07-jankenExploit.mp3",
+      "audioSec": 35.77,
+      "audioFrames": 1074,
+      "leadInFrames": 12,
+      "durationInFrames": 1112
     },
     {
       "id": "river",
-      "index": 5,
-      "file": "scene-05-river.mp3",
-      "audioSec": 22.37,
-      "audioFrames": 672,
+      "index": 8,
+      "file": "scene-08-river.mp3",
+      "audioSec": 35.335,
+      "audioFrames": 1061,
       "leadInFrames": 12,
-      "durationInFrames": 710
+      "durationInFrames": 1099
+    },
+    {
+      "id": "potodds",
+      "index": 9,
+      "file": "scene-09-potodds.mp3",
+      "audioSec": 38.465,
+      "audioFrames": 1154,
+      "leadInFrames": 12,
+      "durationInFrames": 1192
     },
     {
       "id": "ratio",
-      "index": 6,
-      "file": "scene-06-ratio.mp3",
-      "audioSec": 32.685,
-      "audioFrames": 981,
+      "index": 10,
+      "file": "scene-10-ratio.mp3",
+      "audioSec": 39.945,
+      "audioFrames": 1199,
       "leadInFrames": 12,
-      "durationInFrames": 1019
+      "durationInFrames": 1237
+    },
+    {
+      "id": "indiff",
+      "index": 11,
+      "file": "scene-11-indiff.mp3",
+      "audioSec": 39.755,
+      "audioFrames": 1193,
+      "leadInFrames": 12,
+      "durationInFrames": 1231
+    },
+    {
+      "id": "ranges",
+      "index": 12,
+      "file": "scene-12-ranges.mp3",
+      "audioSec": 46.955,
+      "audioFrames": 1409,
+      "leadInFrames": 12,
+      "durationInFrames": 1447
     },
     {
       "id": "exploit",
-      "index": 7,
-      "file": "scene-07-exploit.mp3",
-      "audioSec": 23.315,
-      "audioFrames": 700,
+      "index": 13,
+      "file": "scene-13-exploit.mp3",
+      "audioSec": 34.825,
+      "audioFrames": 1045,
       "leadInFrames": 12,
-      "durationInFrames": 738
+      "durationInFrames": 1083
+    },
+    {
+      "id": "foundation",
+      "index": 14,
+      "file": "scene-14-foundation.mp3",
+      "audioSec": 37.885,
+      "audioFrames": 1137,
+      "leadInFrames": 12,
+      "durationInFrames": 1175
+    },
+    {
+      "id": "solved",
+      "index": 15,
+      "file": "scene-15-solved.mp3",
+      "audioSec": 41.505,
+      "audioFrames": 1246,
+      "leadInFrames": 12,
+      "durationInFrames": 1284
     },
     {
       "id": "roadmap",
-      "index": 8,
-      "file": "scene-08-roadmap.mp3",
-      "audioSec": 12.43,
-      "audioFrames": 373,
+      "index": 16,
+      "file": "scene-16-roadmap.mp3",
+      "audioSec": 23.575,
+      "audioFrames": 708,
       "leadInFrames": 12,
-      "durationInFrames": 411
+      "durationInFrames": 746
     },
     {
       "id": "summary",
-      "index": 9,
-      "file": "scene-09-summary.mp3",
-      "audioSec": 21.96,
-      "audioFrames": 659,
+      "index": 17,
+      "file": "scene-17-summary.mp3",
+      "audioSec": 29.305,
+      "audioFrames": 880,
       "leadInFrames": 12,
-      "durationInFrames": 697
+      "durationInFrames": 918
+    },
+    {
+      "id": "next",
+      "index": 18,
+      "file": "scene-18-next.mp3",
+      "audioSec": 23.875,
+      "audioFrames": 717,
+      "leadInFrames": 12,
+      "durationInFrames": 755
     }
   ]
 }
