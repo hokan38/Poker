@@ -1,0 +1,90 @@
+{
+  "fps": 30,
+  "leadInFrames": 12,
+  "tailFrames": 26,
+  "totalFrames": 5731,
+  "totalSec": 191.03,
+  "scenes": [
+    {
+      "id": "title",
+      "index": 1,
+      "file": "scene-01-title.mp3",
+      "audioSec": 9.565,
+      "audioFrames": 287,
+      "leadInFrames": 12,
+      "durationInFrames": 325
+    },
+    {
+      "id": "hook",
+      "index": 2,
+      "file": "scene-02-hook.mp3",
+      "audioSec": 17.285,
+      "audioFrames": 519,
+      "leadInFrames": 12,
+      "durationInFrames": 557
+    },
+    {
+      "id": "def",
+      "index": 3,
+      "file": "scene-03-def.mp3",
+      "audioSec": 13.73,
+      "audioFrames": 412,
+      "leadInFrames": 12,
+      "durationInFrames": 450
+    },
+    {
+      "id": "janken",
+      "index": 4,
+      "file": "scene-04-janken.mp3",
+      "audioSec": 26.19,
+      "audioFrames": 786,
+      "leadInFrames": 12,
+      "durationInFrames": 824
+    },
+    {
+      "id": "river",
+      "index": 5,
+      "file": "scene-05-river.mp3",
+      "audioSec": 22.37,
+      "audioFrames": 672,
+      "leadInFrames": 12,
+      "durationInFrames": 710
+    },
+    {
+      "id": "ratio",
+      "index": 6,
+      "file": "scene-06-ratio.mp3",
+      "audioSec": 32.685,
+      "audioFrames": 981,
+      "leadInFrames": 12,
+      "durationInFrames": 1019
+    },
+    {
+      "id": "exploit",
+      "index": 7,
+      "file": "scene-07-exploit.mp3",
+      "audioSec": 23.315,
+      "audioFrames": 700,
+      "leadInFrames": 12,
+      "durationInFrames": 738
+    },
+    {
+      "id": "roadmap",
+      "index": 8,
+      "file": "scene-08-roadmap.mp3",
+      "audioSec": 12.43,
+      "audioFrames": 373,
+      "leadInFrames": 12,
+      "durationInFrames": 411
+    },
+    {
+      "id": "summary",
+      "index": 9,
+      "file": "scene-09-summary.mp3",
+      "audioSec": 21.96,
+      "audioFrames": 659,
+      "leadInFrames": 12,
+      "durationInFrames": 697
+    }
+  ]
+}

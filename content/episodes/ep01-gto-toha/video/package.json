@@ -1,0 +1,21 @@
+{
+  "name": "ep01-gto-toha-video",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Remotion project: Poker GTO series Episode 1 (auto-generated MP4 with narration)",
+  "scripts": {
+    "render": "remotion render Episode1 out/ep01-gto-toha.mp4 --browser-executable=/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+    "studio": "remotion studio",
+    "still": "remotion still Episode1 out/still.png --browser-executable=/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.485",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.485"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "typescript": "5.6.3"
+  }
+}
