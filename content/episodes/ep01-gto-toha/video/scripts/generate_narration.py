@@ -34,6 +34,21 @@ FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
 
 MIN_CHARS = 12   # 字幕1枚の最小文字数の目安
 
+# 字幕表示用の置換（TTSはカタカナのまま、表示だけ英字/記号に）
+CAPTION_REPL = {
+    "ジーティーオー": "GTO", "イーブイ": "EV", "ビービー": "bb",
+    "リブラタス": "Libratus", "プルリバス": "Pluribus", "ケフェウス": "Cepheus",
+    "ヘッズアップ": "ヘッズアップ",
+}
+
+
+def clean_caption(s):
+    """字幕表示用に整える：読点を減らし、カタカナ用語を英字表記へ。"""
+    for k, v in CAPTION_REPL.items():
+        s = s.replace(k, v)
+    s = s.replace("、", "")   # 読点を除いて自然な字幕に
+    return s.strip()
+
 
 def make_captions(text, audio_frames, lead_in, fps):
     """ナレーションを句読点で区切り、文字数に比例して時間割りした字幕を作る。
@@ -47,8 +62,8 @@ def make_captions(text, audio_frames, lead_in, fps):
             cur = ""
     if cur:
         chunks.append(cur)
-    # 表示は末尾の読点を除いて整える
-    disp = [c.rstrip("、") for c in chunks]
+    # 表示は読点を減らし英字表記へ
+    disp = [clean_caption(c) for c in chunks]
     total_chars = sum(len(c) for c in chunks) or 1
     caps, acc = [], lead_in
     for c, d in zip(chunks, disp):
