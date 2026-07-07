@@ -1,6 +1,7 @@
+import { useEffect, useState } from "react";
 import { continueRender, delayRender, staticFile } from "remotion";
 
-// 上質フォントを public/fonts から読み込み、読み込み完了までレンダリングを待たせる。
+// 上質フォント（public/fonts の woff2）を読み込む。
 type Face = { family: string; weight: string; file: string };
 
 const FACES: Face[] = [
@@ -11,9 +12,10 @@ const FACES: Face[] = [
   ...[500, 600, 700].map((w) => ({ family: "Cormorant Garamond", weight: String(w), file: `cormorant-garamond-latin-${w}-normal.woff2` })),
 ];
 
-if (typeof document !== "undefined") {
-  const handle = delayRender("load-fonts");
-  Promise.all(
+let loadPromise: Promise<void> | null = null;
+function loadAllFonts(): Promise<void> {
+  if (loadPromise) return loadPromise;
+  loadPromise = Promise.all(
     FACES.map(async (f) => {
       try {
         const ff = new FontFace(f.family, `url(${staticFile("fonts/" + f.file)}) format('woff2')`, {
@@ -25,8 +27,23 @@ if (typeof document !== "undefined") {
         // 個別失敗は無視（フォールバック表示）
       }
     })
-  ).then(() => continueRender(handle)).catch(() => continueRender(handle));
+  ).then(() => undefined);
+  return loadPromise;
 }
+
+/** レンダリング前にフォント読み込みを待たせるフック（コンポーネント内で1回呼ぶ）。 */
+export const useFonts = (): void => {
+  const [handle] = useState(() => delayRender("load-fonts"));
+  useEffect(() => {
+    let alive = true;
+    loadAllFonts().then(() => {
+      if (alive) continueRender(handle);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [handle]);
+};
 
 export const MINCHO = '"Shippori Mincho", serif';
 export const LATIN = '"Cormorant Garamond", "Shippori Mincho", serif';

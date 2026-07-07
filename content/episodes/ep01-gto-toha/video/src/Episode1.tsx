@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Audio, Easing, interpolate, Sequence, Series, staticFile, useCurrentFrame } from "remotion";
 import { bg, C, FONT, GRAD } from "./theme";
-import { LATIN } from "./fonts";
+import { LATIN, useFonts } from "./fonts";
 import { Backdrop } from "./components/Backdrop";
 import { SCENES } from "./scenes";
 import manifest from "./manifest.json";
@@ -41,6 +41,7 @@ const HUD: React.FC = () => {
 };
 
 export const Episode1: React.FC = () => {
+  useFonts();
   return (
     <AbsoluteFill style={{ background: bg, fontFamily: FONT }}>
       <Backdrop />
