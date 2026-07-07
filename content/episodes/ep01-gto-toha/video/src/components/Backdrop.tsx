@@ -1,68 +1,59 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { C } from "../theme";
 
-// 動くグロー塊（ラジアルグラデなのでフィルタ不要＝軽量）
-const Blob: React.FC<{ x: number; y: number; r: number; color: string; ax: number; ay: number; sp: number; phase: number }> = ({
-  x, y, r, color, ax, ay, sp, phase,
+// ごく淡い白のグロー（色は使わずモノトーンで奥行きだけ与える）
+const Glow: React.FC<{ x: number; y: number; r: number; a: number; ax: number; sp: number; phase: number }> = ({
+  x, y, r, a, ax, sp, phase,
 }) => {
   const frame = useCurrentFrame();
   const t = frame * sp + phase;
   const dx = Math.sin(t) * ax;
-  const dy = Math.cos(t * 0.8) * ay;
+  const dy = Math.cos(t * 0.8) * ax * 0.6;
   return (
     <div style={{
       position: "absolute", left: `${x}%`, top: `${y}%`, width: r, height: r,
-      transform: `translate(${dx}px, ${dy}px) translate(-50%,-50%)`,
-      background: `radial-gradient(circle, ${color} 0%, transparent 68%)`,
+      transform: `translate(${dx}px,${dy}px) translate(-50%,-50%)`,
+      background: `radial-gradient(circle, rgba(255,255,255,${a}) 0%, transparent 68%)`,
       pointerEvents: "none",
     }} />
   );
 };
 
 const SUITS = ["♠", "♥", "♦", "♣"];
-// 漂うスートのパーティクル（薄く、上へゆっくり流れる）
 const Particle: React.FC<{ i: number }> = ({ i }) => {
   const frame = useCurrentFrame();
   const { height } = useVideoConfig();
   const suit = SUITS[i % 4];
   const x = (i * 137.5) % 100;
-  const size = 26 + ((i * 29) % 40);
-  const speed = 0.18 + ((i * 7) % 10) / 40;
+  const size = 22 + ((i * 29) % 34);
+  const speed = 0.16 + ((i * 7) % 10) / 45;
   const baseY = (i * 53) % 100;
   const yPct = ((baseY - frame * speed * 0.05) % 120 + 120) % 120;
   const y = (yPct / 100) * height - height * 0.1;
-  const rot = frame * (0.12 + (i % 3) * 0.05) + i * 40;
-  const red = suit === "♥" || suit === "♦";
+  const rot = frame * (0.1 + (i % 3) * 0.04) + i * 40;
   return (
     <div style={{
       position: "absolute", left: `${x}%`, top: y, fontSize: size,
-      color: red ? "rgba(216,67,63,0.10)" : "rgba(255,255,255,0.06)",
-      transform: `rotate(${rot}deg)`, pointerEvents: "none", userSelect: "none",
+      color: "rgba(255,255,255,0.035)", transform: `rotate(${rot}deg)`,
+      pointerEvents: "none", userSelect: "none",
     }}>{suit}</div>
   );
 };
 
+// フィルムグレイン（静的・SVGノイズ）
+const GRAIN =
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
+
 export const Backdrop: React.FC = () => {
   return (
     <AbsoluteFill style={{ overflow: "hidden" }}>
-      {/* グロー塊 */}
-      <Blob x={22} y={18} r={1100} color="rgba(63,191,127,0.16)" ax={60} ay={40} sp={0.010} phase={0} />
-      <Blob x={82} y={30} r={950} color="rgba(232,193,90,0.12)" ax={70} ay={50} sp={0.008} phase={2} />
-      <Blob x={60} y={92} r={1200} color="rgba(47,120,90,0.18)" ax={80} ay={30} sp={0.006} phase={4} />
-      {/* パーティクル */}
-      {Array.from({ length: 16 }).map((_, i) => <Particle key={i} i={i} />)}
+      <Glow x={28} y={22} r={1200} a={0.05} ax={50} sp={0.008} phase={0} />
+      <Glow x={78} y={70} r={1000} a={0.035} ax={60} sp={0.006} phase={3} />
+      {Array.from({ length: 14 }).map((_, i) => <Particle key={i} i={i} />)}
+      {/* グレイン */}
+      <AbsoluteFill style={{ backgroundImage: GRAIN, backgroundSize: "280px 280px", opacity: 0.05, mixBlendMode: "soft-light", pointerEvents: "none" }} />
       {/* ヴィネット */}
-      <AbsoluteFill style={{
-        background: "radial-gradient(120% 100% at 50% 45%, transparent 55%, rgba(0,0,0,0.42) 100%)",
-        pointerEvents: "none",
-      }} />
-      {/* 上部の淡い光 */}
-      <div style={{
-        position: "absolute", top: -200, left: "50%", transform: "translateX(-50%)",
-        width: 1600, height: 500, background: `radial-gradient(ellipse, rgba(232,193,90,0.10), transparent 70%)`,
-        pointerEvents: "none",
-      }} />
+      <AbsoluteFill style={{ background: "radial-gradient(120% 100% at 50% 42%, transparent 52%, rgba(0,0,0,0.55) 100%)", pointerEvents: "none" }} />
     </AbsoluteFill>
   );
 };

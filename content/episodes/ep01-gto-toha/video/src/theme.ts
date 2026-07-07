@@ -1,36 +1,31 @@
+// ハイクラス・モノトーン基調（黒 × 白 × シャンパンゴールド）
 export const C = {
-  felt: "#08201a",
-  felt2: "#0e3327",
-  feltEdge: "#03100b",
-  ink: "#f5f2ea",
-  muted: "#9fb7ab",
-  gold: "#e8c15a",
-  goldBright: "#f7dd8a",
-  green: "#3fbf7f",
-  greenNeon: "#5ef0a6",
-  exploit: "#ef8a52",
-  exploitNeon: "#ffb07a",
-  cardWhite: "#f8f5ec",
-  cardRed: "#d8433f",
-  cardBlack: "#16241d",
+  bg: "#0a0a0c",
+  bg2: "#17171b",
+  edge: "#050506",
+  ink: "#f4f1ea",      // 温かみのある白（アイボリー）
+  inkSoft: "#d9d6cd",
+  muted: "#8f8c84",
+  faint: "#5c5a55",
   line: "rgba(255,255,255,0.12)",
-  panel: "rgba(255,255,255,0.045)",
+  hair: "rgba(255,255,255,0.30)",
+  gold: "#c8a96b",      // シャンパンゴールド（唯一の差し色）
+  goldSoft: "#e0c896",
+  silver: "#a9afb3",    // プラチナ／シルバー（対比色）
+  silverSoft: "#d0d5d7",
+  cardBg: "#f2eee4",    // アイボリーのカード
+  cardInk: "#191510",   // 墨（全スート共通＝モノクロデッキ）
+  panel: "rgba(255,255,255,0.035)",
 };
 
 export const FONT =
   '"Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",system-ui,sans-serif';
 
 export const GRAD = {
-  gold: "linear-gradient(120deg,#f7dd8a 0%,#e8c15a 45%,#d79a35 100%)",
-  green: "linear-gradient(120deg,#5ef0a6 0%,#3fbf7f 60%,#2c9d64 100%)",
-  exploit: "linear-gradient(120deg,#ffb07a 0%,#ef8a52 60%,#d96a34 100%)",
-  ink: "linear-gradient(120deg,#ffffff 0%,#dfeee6 100%)",
+  ink: "linear-gradient(120deg,#ffffff 0%,#ece8de 100%)",
+  gold: "linear-gradient(120deg,#ecd6a6 0%,#c8a96b 52%,#a37f3c 100%)",
+  silver: "linear-gradient(120deg,#eceff0 0%,#a9afb3 55%,#83898c 100%)",
 };
 
-// フェルトのラジアル背景（Backdrop の下地）
-export const feltBackground =
-  `radial-gradient(130% 110% at 50% -12%, ${C.felt2} 0%, ${C.felt} 52%, ${C.feltEdge} 100%)`;
-
-// glow 用ヘルパー
-export const glow = (color: string, blur = 40, spread = 0) =>
-  `0 0 ${blur}px ${spread}px ${color}`;
+export const bg =
+  `radial-gradient(120% 100% at 50% 30%, ${C.bg2} 0%, ${C.bg} 55%, ${C.edge} 100%)`;

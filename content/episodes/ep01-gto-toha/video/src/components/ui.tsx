@@ -1,99 +1,93 @@
 import React from "react";
 import { Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { C, FONT, GRAD, glow } from "../theme";
+import { C, FONT, GRAD } from "../theme";
 
 const EASE = Easing.bezier(0.22, 1, 0.36, 1);
 
-/** フェード＋上スライド＋ブラー＋スケールで洗練された登場。 */
 export const Reveal: React.FC<{
   delay?: number; y?: number; blur?: number; scale?: number;
   children: React.ReactNode; style?: React.CSSProperties;
-}> = ({ delay = 0, y = 30, blur = 10, scale = 0.98, children, style }) => {
+}> = ({ delay = 0, y = 26, blur = 8, scale = 0.99, children, style }) => {
   const frame = useCurrentFrame();
-  const t = interpolate(frame - delay, [0, 18], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: EASE });
+  const t = interpolate(frame - delay, [0, 20], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: EASE });
   const b = (1 - t) * blur;
   return (
     <div style={{
-      opacity: t,
-      transform: `translateY(${(1 - t) * y}px) scale(${scale + (1 - scale) * t})`,
-      filter: b > 0.15 ? `blur(${b}px)` : "none",
-      ...style,
+      opacity: t, transform: `translateY(${(1 - t) * y}px) scale(${scale + (1 - scale) * t})`,
+      filter: b > 0.15 ? `blur(${b}px)` : "none", ...style,
     }}>{children}</div>
   );
 };
 
-/** グラデーション文字（背景クリップ）。shine=true で光沢が流れる。 */
+/** グラデーション文字。金・銀・白の金属質。 */
 export const GradientText: React.FC<{
   children: React.ReactNode; gradient?: string; fontSize?: number; weight?: number;
-  delay?: number; shine?: boolean; glowColor?: string;
-}> = ({ children, gradient = GRAD.gold, fontSize = 100, weight = 900, delay = 0, shine = true, glowColor }) => {
+  delay?: number; shine?: boolean; ls?: string;
+}> = ({ children, gradient = GRAD.ink, fontSize = 100, weight = 700, delay = 0, shine = false, ls = "0.01em" }) => {
   const frame = useCurrentFrame();
-  const t = interpolate(frame - delay, [0, 20], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: EASE });
-  const pos = shine ? interpolate((frame - delay) % 150, [0, 150], [0, 200]) : 0;
+  const t = interpolate(frame - delay, [0, 22], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: EASE });
+  const pos = shine ? interpolate((frame - delay) % 180, [0, 180], [0, 200]) : 0;
   return (
     <span style={{
-      display: "inline-block", fontFamily: FONT, fontWeight: weight, fontSize, lineHeight: 1.1,
-      backgroundImage: gradient, backgroundSize: shine ? "200% 100%" : "100% 100%",
-      backgroundPosition: `${pos}% 0`,
+      display: "inline-block", fontFamily: FONT, fontWeight: weight, fontSize, lineHeight: 1.12, letterSpacing: ls,
+      backgroundImage: gradient, backgroundSize: shine ? "200% 100%" : "100% 100%", backgroundPosition: `${pos}% 0`,
       WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent",
-      filter: glowColor ? `drop-shadow(0 0 24px ${glowColor})` : "none",
-      opacity: t, transform: `translateY(${(1 - t) * 22}px)`,
+      opacity: t, transform: `translateY(${(1 - t) * 20}px)`,
     }}>{children}</span>
   );
 };
 
-/** 斜めの光が一度だけ横切るスイープ（タイトル用）。 */
+/** 白い光が一度だけ横切る（控えめ）。 */
 export const LightSweep: React.FC<{ delay?: number; duration?: number; children: React.ReactNode }> = ({
-  delay = 0, duration = 40, children,
+  delay = 0, duration = 46, children,
 }) => {
   const frame = useCurrentFrame();
   const p = interpolate(frame - delay, [0, duration], [-30, 140], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: EASE });
+  const on = frame - delay >= 0 && frame - delay <= duration;
   return (
     <div style={{ position: "relative", display: "inline-block", overflow: "hidden" }}>
       {children}
       <div style={{
-        position: "absolute", top: 0, bottom: 0, left: `${p}%`, width: "22%",
-        background: "linear-gradient(105deg, transparent, rgba(255,255,255,0.55), transparent)",
-        transform: "skewX(-18deg)", pointerEvents: "none",
-        opacity: frame - delay >= 0 && frame - delay <= duration ? 1 : 0,
+        position: "absolute", top: 0, bottom: 0, left: `${p}%`, width: "20%",
+        background: "linear-gradient(105deg, transparent, rgba(255,255,255,0.4), transparent)",
+        transform: "skewX(-18deg)", pointerEvents: "none", opacity: on ? 1 : 0,
       }} />
     </div>
   );
 };
 
-export const Kicker: React.FC<{ children: React.ReactNode; delay?: number }> = ({ children, delay = 0 }) => (
-  <Reveal delay={delay} y={18} blur={6}>
-    <div style={{ display: "flex", alignItems: "center", gap: 16, fontFamily: FONT }}>
-      <span style={{ width: 44, height: 6, borderRadius: 3, background: GRAD.gold, boxShadow: glow("rgba(232,193,90,0.6)", 14) }} />
-      <span style={{ color: C.gold, fontWeight: 800, letterSpacing: "0.16em", fontSize: 34 }}>{children}</span>
-    </div>
-  </Reveal>
-);
+/** 細いゴールドの罫 + 字間を空けたラベル（エディトリアルな見出し）。 */
+export const Kicker: React.FC<{ children: React.ReactNode; delay?: number }> = ({ children, delay = 0 }) => {
+  const frame = useCurrentFrame();
+  const w = interpolate(frame - delay, [0, 24], [0, 54], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: EASE });
+  return (
+    <Reveal delay={delay} y={14} blur={4}>
+      <div style={{ display: "flex", alignItems: "center", gap: 20, fontFamily: FONT }}>
+        <span style={{ width: w, height: 1.5, background: C.gold }} />
+        <span style={{ color: C.gold, fontWeight: 600, letterSpacing: "0.34em", fontSize: 27 }}>{children}</span>
+      </div>
+    </Reveal>
+  );
+};
 
-/** ポップイン＋グロー＋わずかな回転で決めるスタンプ。 */
-export const Stamp: React.FC<{ delay?: number; color?: string; children: React.ReactNode; fontSize?: number; gradient?: string }> = ({
-  delay = 0, color = C.gold, children, fontSize = 64, gradient = GRAD.gold,
+/** 細いゴールド下線が引かれる上品な強調。 */
+export const Stamp: React.FC<{ delay?: number; children: React.ReactNode; fontSize?: number; color?: string }> = ({
+  delay = 0, children, fontSize = 56, color = C.ink,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const s = spring({ frame: frame - delay, fps, config: { damping: 11, mass: 0.9, stiffness: 150 } });
-  const scale = interpolate(s, [0, 1], [0.4, 1]);
-  const rot = interpolate(s, [0, 1], [-4, 0]);
-  const opacity = interpolate(frame - delay, [0, 6], [0, 1], { extrapolateRight: "clamp", extrapolateLeft: "clamp" });
-  const pulse = 0.5 + 0.5 * Math.sin((frame - delay) / 16);
+  const s = spring({ frame: frame - delay, fps, config: { damping: 200, mass: 0.7 } });
+  const opacity = interpolate(s, [0, 0.4], [0, 1], { extrapolateRight: "clamp" });
+  const uw = interpolate(frame - delay, [8, 34], [0, 100], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: EASE });
   return (
-    <div style={{
-      display: "inline-block", transform: `scale(${scale}) rotate(${rot}deg)`, opacity,
-      color: "#05140d", backgroundImage: gradient, fontWeight: 900, fontSize, fontFamily: FONT,
-      padding: "16px 42px", borderRadius: 18,
-      boxShadow: `0 16px 38px rgba(0,0,0,0.45), ${glow(`rgba(232,193,90,${0.25 + pulse * 0.35})`, 30)}`,
-    }}>
-      {children}
+    <div style={{ display: "inline-block", opacity, transform: `translateY(${(1 - s) * 14}px)`, fontFamily: FONT }}>
+      <div style={{ fontSize, fontWeight: 700, color, letterSpacing: "0.04em", padding: "2px 6px 12px" }}>{children}</div>
+      <div style={{ height: 2, width: `${uw}%`, background: C.gold, marginTop: -6 }} />
     </div>
   );
 };
 
-/** 3等分ドーナツ＋外周グロー。 */
+/** 3等分ドーナツ（白・金・銀のモノトーン）。 */
 export const Donut: React.FC<{ size?: number; delay?: number; label?: string; colors: string[] }> = ({
   size = 340, delay = 0, label, colors,
 }) => {
@@ -105,65 +99,63 @@ export const Donut: React.FC<{ size?: number; delay?: number; label?: string; co
   const stops = colors.map((col, i) => `${col} ${i * seg}deg ${(i + 1) * seg}deg`).join(", ");
   return (
     <div style={{ position: "relative", width: size, height: size }}>
-      <div style={{ position: "absolute", inset: -14, borderRadius: "50%", background: "radial-gradient(circle, rgba(63,191,127,0.25), transparent 70%)", opacity: interpolate(s, [0.5, 1], [0, 1], { extrapolateLeft: "clamp" }) }} />
       <div style={{
-        width: size, height: size, borderRadius: "50%",
-        background: `conic-gradient(${stops})`,
+        width: size, height: size, borderRadius: "50%", background: `conic-gradient(${stops})`,
         WebkitMaskImage: `conic-gradient(#000 ${sweep}deg, transparent ${sweep}deg)`,
         maskImage: `conic-gradient(#000 ${sweep}deg, transparent ${sweep}deg)`,
-        boxShadow: "0 0 0 10px rgba(255,255,255,0.05), 0 24px 60px rgba(0,0,0,0.45)",
+        boxShadow: "0 0 0 1px rgba(255,255,255,0.12), 0 24px 60px rgba(0,0,0,0.5)",
       }} />
       <div style={{
-        position: "absolute", inset: "27%", borderRadius: "50%", background: C.felt,
+        position: "absolute", inset: "30%", borderRadius: "50%", background: C.bg,
         display: "grid", placeItems: "center", textAlign: "center", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.14)",
-        color: C.ink, fontWeight: 800, fontSize: size * 0.1, fontFamily: FONT,
+        color: C.ink, fontWeight: 600, fontSize: size * 0.095, fontFamily: FONT, letterSpacing: "0.04em",
         opacity: interpolate(s, [0.6, 1], [0, 1], { extrapolateLeft: "clamp" }),
       }}>{label}</div>
     </div>
   );
 };
 
-/** 割合バー（イージング＋数値カウントアップ＋光沢）。 */
+/** 細い割合バー（金・銀）＋数値カウントアップ。 */
 export const Bar: React.FC<{
-  label: string; value: number; color: string; gradient?: string; delay?: number; suffix?: string; width?: number;
-}> = ({ label, value, color, gradient, delay = 0, suffix = "%", width = 720 }) => {
+  label: string; value: number; gradient?: string; color?: string; delay?: number; suffix?: string; width?: number;
+}> = ({ label, value, gradient = GRAD.gold, color = C.gold, delay = 0, suffix = "%", width = 620 }) => {
   const frame = useCurrentFrame();
-  const t = interpolate(frame - delay, [0, 26], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: EASE });
+  const t = interpolate(frame - delay, [0, 28], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: EASE });
   const w = t * value * width;
   const pct = Math.round(t * value * 100);
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 22, fontFamily: FONT, opacity: interpolate(frame - delay, [0, 8], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}>
-      <div style={{ width: 300, fontSize: 34, color: C.ink, textAlign: "right", fontWeight: 700 }}>{label}</div>
-      <div style={{ width, height: 46, background: "rgba(255,255,255,0.06)", borderRadius: 12, overflow: "hidden", border: `1px solid ${C.line}` }}>
-        <div style={{ width: w, height: "100%", background: gradient || color, borderRadius: 12, boxShadow: glow(color, 18) }} />
+    <div style={{ display: "flex", alignItems: "center", gap: 24, fontFamily: FONT, opacity: interpolate(frame - delay, [0, 8], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) }}>
+      <div style={{ width: 300, fontSize: 32, color: C.inkSoft, textAlign: "right", fontWeight: 500 }}>{label}</div>
+      <div style={{ width, height: 12, background: "rgba(255,255,255,0.08)", borderRadius: 8, overflow: "hidden" }}>
+        <div style={{ width: w, height: "100%", background: gradient, borderRadius: 8 }} />
       </div>
-      <div style={{ width: 170, fontSize: 36, fontWeight: 800, color }}>{pct}{suffix}</div>
+      <div style={{ width: 150, fontSize: 34, fontWeight: 700, color }}>{pct}{suffix}</div>
     </div>
   );
 };
 
-/** チップスタック（光沢つき）。 */
-export const ChipStack: React.FC<{ n?: number; delay?: number; color?: string; label?: string }> = ({
-  n = 5, delay = 0, color = C.gold, label,
+/** ポットのチップ（黒地＋ゴールドの縁）。 */
+export const ChipStack: React.FC<{ n?: number; delay?: number; label?: string }> = ({
+  n = 5, delay = 0, label,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   return (
-    <div style={{ position: "relative", width: 120, height: 60 + n * 16, fontFamily: FONT }}>
+    <div style={{ position: "relative", width: 116, height: 56 + n * 15, fontFamily: FONT }}>
       {Array.from({ length: n }).map((_, i) => {
-        const s = spring({ frame: frame - delay - i * 4, fps, config: { damping: 13, stiffness: 130 } });
+        const s = spring({ frame: frame - delay - i * 4, fps, config: { damping: 14, stiffness: 130 } });
         const op = interpolate(s, [0, 1], [0, 1]);
-        const ty = interpolate(s, [0, 1], [-44, 0]);
+        const ty = interpolate(s, [0, 1], [-42, 0]);
         return (
           <div key={i} style={{
-            position: "absolute", bottom: i * 16, left: 0, width: 120, height: 34, borderRadius: "50%",
-            background: `radial-gradient(circle at 40% 30%, #fff6, transparent 45%), ${color}`,
-            border: "4px dashed rgba(255,255,255,0.6)", boxShadow: "0 6px 14px rgba(0,0,0,0.4)",
+            position: "absolute", bottom: i * 15, left: 0, width: 116, height: 32, borderRadius: "50%",
+            background: "radial-gradient(circle at 42% 32%, #2a2a2c, #101012 70%)",
+            border: `2px solid ${C.gold}`, boxShadow: "0 5px 12px rgba(0,0,0,0.5)",
             opacity: op, transform: `translateY(${ty}px)`,
           }} />
         );
       })}
-      {label ? <div style={{ position: "absolute", bottom: -46, width: 120, textAlign: "center", color: C.ink, fontWeight: 800, fontSize: 30 }}>{label}</div> : null}
+      {label ? <div style={{ position: "absolute", bottom: -44, width: 116, textAlign: "center", color: C.inkSoft, fontWeight: 600, fontSize: 28 }}>{label}</div> : null}
     </div>
   );
 };
@@ -172,11 +164,17 @@ export const Panel: React.FC<{ children: React.ReactNode; style?: React.CSSPrope
   children, style, accent = C.line,
 }) => (
   <div style={{
-    background: "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
-    border: `1px solid ${accent}`, borderRadius: 22, padding: "34px 40px", fontFamily: FONT,
-    backdropFilter: "blur(4px)", boxShadow: "0 20px 50px rgba(0,0,0,0.3)",
-    ...style,
+    background: "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015))",
+    border: `1px solid ${accent}`, borderRadius: 18, padding: "32px 38px", fontFamily: FONT,
+    backdropFilter: "blur(3px)", boxShadow: "0 24px 60px rgba(0,0,0,0.4)", ...style,
   }}>
     {children}
   </div>
 );
+
+/** 細い水平罫（区切り）。 */
+export const Rule: React.FC<{ delay?: number; width?: number; color?: string }> = ({ delay = 0, width = 200, color = C.line }) => {
+  const frame = useCurrentFrame();
+  const w = interpolate(frame - delay, [0, 26], [0, width], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: EASE });
+  return <div style={{ height: 1, width: w, background: color }} />;
+};
