@@ -58,15 +58,10 @@ export const PokerTable: React.FC<{
         boxShadow: "inset 0 0 80px rgba(0,0,0,0.5), 0 30px 70px rgba(0,0,0,0.5), 0 0 0 2px rgba(0,0,0,0.4)",
       }} />
       <div style={{ position: "absolute", inset: 22, borderRadius: "50%", border: "1px solid rgba(200,169,107,0.35)" }} />
-      {/* 相手 */}
-      <div style={{ position: "absolute", top: 40, left: 0, right: 0, textAlign: "center" }}>
-        <div style={{ fontFamily: LATIN, fontSize: 30, letterSpacing: "0.2em", color: "rgba(255,255,255,0.7)", marginBottom: 12 }}>OPPONENT</div>
-        <div style={{ display: "flex", justifyContent: "center", gap: 6 }}>
-          {[0, 1].map((k) => <Card key={k} card="Ks" faceDown w={72} frame={frame} delay={boardDelay - 6 + k * 3} rise={30} float={false} />)}
-        </div>
-      </div>
+      {/* 相手の席（カードは伏せず表示しない） */}
+      <div style={{ position: "absolute", top: 56, left: 0, right: 0, textAlign: "center", fontFamily: LATIN, fontSize: 30, letterSpacing: "0.22em", color: "rgba(255,255,255,0.55)" }}>OPPONENT</div>
       {/* ポット */}
-      <div style={{ position: "absolute", top: 220, left: 0, right: 0, display: "flex", justifyContent: "center", opacity: interpolate(potS, [0, 1], [0, 1]), transform: `translateY(${interpolate(potS, [0, 1], [20, 0])}px)` }}>
+      <div style={{ position: "absolute", top: 200, left: 0, right: 0, display: "flex", justifyContent: "center", opacity: interpolate(potS, [0, 1], [0, 1]), transform: `translateY(${interpolate(potS, [0, 1], [20, 0])}px)` }}>
         <div style={{ position: "relative", width: 120, height: 60 }}>
           {[0, 1, 2, 3, 4].map((k) => (
             <div key={k} style={{ position: "absolute", left: (k % 2) * 40 + 20, bottom: Math.floor(k / 2) * 12, width: 60, height: 18, borderRadius: "50%", background: "radial-gradient(circle at 40% 30%, #2a2a2c, #101012 70%)", border: `2px solid ${C.gold}` }} />
