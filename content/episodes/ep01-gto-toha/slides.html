@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ep1 GTOとは何か？｜ポーカーGTO解説</title>
+<style>
+  :root{
+    --felt:#071a12; --felt2:#0a2419; --panel:rgba(255,255,255,.05);
+    --line:rgba(255,255,255,.12); --ink:#f4f1e8; --muted:#aebfb4;
+    --gold:#e8c15a; --green:#3fbf7f; --exploit:#e58a55;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    background:#04120c; color:var(--ink);
+    font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","YuGothic","Meiryo","Noto Sans JP",system-ui,sans-serif;
+    overflow:hidden;
+  }
+  .deck{position:fixed; inset:0; display:grid; place-items:center;}
+  .stage{
+    position:relative; width:min(100vw,177.78vh); height:min(56.25vw,100vh);
+    aspect-ratio:16/9; container-type:size; overflow:hidden;
+    background:radial-gradient(120% 100% at 50% -10%,var(--felt2),var(--felt) 62%,#04120c);
+    box-shadow:0 0 0 1px rgba(255,255,255,.05) inset;
+  }
+  .slide{
+    position:absolute; inset:0; padding:7cqh 9cqw 10cqh;
+    display:flex; flex-direction:column; justify-content:center; gap:3.2cqh;
+    opacity:0; visibility:hidden; transition:opacity .35s ease;
+  }
+  .slide.active{opacity:1; visibility:visible;}
+  /* typographic scale in container units */
+  h1{font-size:10cqh; line-height:1.08; letter-spacing:.01em;}
+  h2{font-size:6.4cqh; line-height:1.14;}
+  .kicker{color:var(--gold); font-size:3.2cqh; font-weight:700; letter-spacing:.14em;}
+  .lead{font-size:4.4cqh; line-height:1.5; color:var(--ink);}
+  .muted{color:var(--muted);}
+  .big{font-size:7.4cqh; line-height:1.18; font-weight:800;}
+  .gold{color:var(--gold);} .grn{color:var(--green);} .exp{color:var(--exploit);}
+  .pill{display:inline-block; padding:.5cqh 2cqw; border:1px solid var(--gold); color:var(--gold);
+        border-radius:999px; font-size:2.9cqh; font-weight:700; letter-spacing:.08em;}
+  ul{list-style:none; display:flex; flex-direction:column; gap:2.4cqh;}
+  li{font-size:4.2cqh; line-height:1.4; padding-left:5cqw; position:relative;}
+  li::before{content:""; position:absolute; left:0; top:1.6cqh; width:2.4cqh; height:2.4cqh;
+             border-radius:50%; background:var(--gold); box-shadow:0 0 0 .6cqh rgba(232,193,90,.18);}
+  .num li{padding-left:6.5cqw;}
+  .num{counter-reset:n;}
+  .num li::before{counter-increment:n; content:counter(n); background:var(--green);
+    width:4cqh; height:4cqh; top:.6cqh; color:#04120c; font-weight:800; font-size:2.6cqh;
+    display:grid; place-items:center; box-shadow:none;}
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:2.2cqh; padding:4cqh 4cqw;}
+  .center{align-items:center; text-align:center; justify-content:center;}
+  .row{display:flex; gap:4cqw; align-items:stretch;}
+  .col{flex:1;}
+  /* pie for janken */
+  .pie{width:34cqh; height:34cqh; border-radius:50%;
+    background:conic-gradient(var(--green) 0 33.33%, var(--gold) 0 66.66%, var(--exploit) 0 100%);
+    box-shadow:0 0 0 1.2cqh rgba(255,255,255,.06), 0 2cqh 6cqh rgba(0,0,0,.4); position:relative;}
+  .pie::after{content:"1/3\00a0 ずつ"; position:absolute; inset:26%; border-radius:50%;
+    background:var(--felt); display:grid; place-items:center; text-align:center;
+    font-size:3cqh; font-weight:800; color:var(--ink); box-shadow:0 0 0 1px var(--line) inset;}
+  .legend{display:flex; flex-direction:column; gap:2.6cqh; justify-content:center;}
+  .legend div{display:flex; align-items:center; gap:2cqw; font-size:4cqh; font-weight:700;}
+  .dot{width:3.4cqh; height:3.4cqh; border-radius:.6cqh; flex:none;}
+  /* table */
+  table{width:100%; border-collapse:collapse; font-size:3.8cqh;}
+  th,td{padding:2.4cqh 2cqw; text-align:left; border-bottom:1px solid var(--line);}
+  th{color:var(--muted); font-weight:700; font-size:3.2cqh; letter-spacing:.04em;}
+  td.v{font-weight:800; font-size:4.6cqh;}
+  /* compare */
+  .cmp{border-radius:2cqh; padding:4cqh 3cqw; border:1px solid var(--line);}
+  .cmp h3{font-size:4.6cqh; margin-bottom:2.4cqh;}
+  .cmp.g{background:rgba(63,191,127,.10); border-color:rgba(63,191,127,.35);}
+  .cmp.e{background:rgba(229,138,85,.10); border-color:rgba(229,138,85,.35);}
+  .cmp p{font-size:3.5cqh; line-height:1.5; color:var(--muted); margin-top:1.2cqh;}
+  /* roadmap */
+  .road{display:flex; flex-direction:column; gap:1.8cqh;}
+  .road .step{display:flex; gap:2.5cqw; align-items:center; background:var(--panel);
+    border:1px solid var(--line); border-radius:1.6cqh; padding:2.4cqh 3cqw;}
+  .road .badge{flex:none; width:8cqw; min-width:8cqw; text-align:center; color:var(--gold);
+    font-weight:800; font-size:3.4cqh;}
+  .road .t{font-size:3.8cqh; font-weight:700;}
+  .road .d{font-size:2.9cqh; color:var(--muted);}
+  .arrow{font-size:6cqh; color:var(--gold); text-align:center; font-weight:800;}
+  /* HUD */
+  .hud{position:absolute; left:0; right:0; bottom:0; height:8cqh; display:flex;
+    align-items:center; justify-content:space-between; padding:0 4cqw;
+    font-size:2.7cqh; color:var(--muted); background:linear-gradient(to top,rgba(0,0,0,.35),transparent);}
+  .hud .ep{color:var(--gold); font-weight:700; letter-spacing:.06em;}
+  .progress{position:absolute; left:0; bottom:0; height:.7cqh; background:var(--gold); width:0; transition:width .3s;}
+  .hint{position:fixed; bottom:8px; left:50%; transform:translateX(-50%); color:#5d7168;
+    font-size:12px; font-family:system-ui,sans-serif;}
+</style>
+</head>
+<body>
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- 1 タイトル -->
+    <section class="slide center">
+      <div class="pill">ポーカー GTO 解説 ・ 全30回シリーズ</div>
+      <h1>GTOとは何か？<br><span class="gold">ポーカー戦略の全体像</span></h1>
+      <p class="lead muted">第1回 ｜ 本格的なポーカー戦略を、数式なしで。</p>
+    </section>
+
+    <!-- 2 フック -->
+    <section class="slide center">
+      <div class="kicker">なぜ、あの人は勝ち続けるのか？</div>
+      <h1 class="big">運？<span class="muted">それとも</span> <span class="gold">戦略</span>？</h1>
+      <p class="lead muted">同じカード、同じテーブル。長い目で見て勝つ人は、<br><span class="grn">戦略</span>で勝っている。その土台が「GTO」。</p>
+    </section>
+
+    <!-- 3 シリーズ紹介 -->
+    <section class="slide">
+      <div class="kicker">このシリーズについて</div>
+      <h2>全30回で、ポーカー戦略を<span class="gold">体系的に</span></h2>
+      <ul>
+        <li>感覚ではなく「<span class="grn">なぜ正解か</span>」を言葉にできるようになる</li>
+        <li>基礎理論 → プリフロップ → フロップ → ターン/リバー → 応用</li>
+        <li>今日はその<span class="gold">入口</span>：GTOの全体像</li>
+      </ul>
+    </section>
+
+    <!-- 4 定義 -->
+    <section class="slide center">
+      <div class="kicker">GTO ＝</div>
+      <h1 class="big"><span class="gold">G</span>ame <span class="gold">T</span>heory <span class="gold">O</span>ptimal</h1>
+      <p class="lead">＝ ゲーム理論的に<strong class="grn">最適</strong>な戦略</p>
+      <p class="lead muted">キーワードは「ゲーム理論」と、数学者ナッシュの<strong>「均衡」</strong>。</p>
+    </section>
+
+    <!-- 5 ナッシュ均衡 -->
+    <section class="slide center">
+      <div class="kicker">ナッシュ均衡 を一言でいうと</div>
+      <h2>相手がどう動いても、<br>こちらが戦略を<span class="gold">変える必要がない</span>状態</h2>
+      <div class="panel" style="margin-top:1cqh;">
+        <p class="big grn" style="font-size:6cqh;">＝ 搾取されない戦略</p>
+      </div>
+      <p class="lead muted">「攻めて勝つ」より、まず「<strong>絶対に負けにくい</strong>」守りの戦略。</p>
+    </section>
+
+    <!-- 6 じゃんけん均衡 -->
+    <section class="slide">
+      <div class="kicker">直感例① ｜ じゃんけん</div>
+      <div class="row" style="align-items:center; gap:6cqw;">
+        <div class="pie"></div>
+        <div class="legend">
+          <div><span class="dot" style="background:var(--green)"></span>グー　1/3</div>
+          <div><span class="dot" style="background:var(--gold)"></span>チョキ 1/3</div>
+          <div><span class="dot" style="background:var(--exploit)"></span>パー　1/3</div>
+          <p class="lead muted" style="margin-top:1cqh;">完全ランダムに1/3ずつ出せば、<br>相手は何をしても<span class="grn">勝率五分</span>。<br>これが「均衡」＝GTO。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 偏ると搾取される -->
+    <section class="slide">
+      <div class="kicker">戦略が偏った瞬間に…</div>
+      <h2 class="center" style="margin-bottom:1cqh;">
+        <span class="exp">グーを多めに</span>　<span class="gold">→</span>　相手は<span class="grn">パーを増やす</span>　<span class="gold">→</span>　<span class="exp">搾取される</span>
+      </h2>
+      <div class="panel center">
+        <p class="lead"><strong class="gold">偏り＝つけ込む隙。</strong>　均衡に近づけるほど、誰にも搾取されない。</p>
+        <p class="lead muted" style="margin-top:1.5cqh;">ポーカーのGTOも、本質はまったく同じ。</p>
+      </div>
+    </section>
+
+    <!-- 8 リバー場面設定 -->
+    <section class="slide">
+      <div class="kicker">直感例② ｜ ポーカーのリバー</div>
+      <h2>あなたは<span class="gold">ポットと同じ100ドル</span>をベット</h2>
+      <ul>
+        <li>ポット：<span class="gold">100ドル</span> ／ あなたのベット：<span class="gold">100ドル</span></li>
+        <li>相手は「<strong>ブラフキャッチャー</strong>」＝強い手には負けるが、<span class="grn">ブラフには勝てる</span>中くらいの手</li>
+        <li>相手の悩み：<strong>コール</strong>すべきか、<strong>降りる</strong>べきか？</li>
+      </ul>
+    </section>
+
+    <!-- 9 バリュー:ブラフ = 2:1 -->
+    <section class="slide">
+      <div class="kicker">理論上の正解は…</div>
+      <h2><span class="grn">バリュー 2</span> ： <span class="exp">ブラフ 1</span></h2>
+      <div class="panel">
+        <table>
+          <tr><th>項目</th><th>値</th></tr>
+          <tr><td>ベットサイズ</td><td class="v">ポットと同額（100%）</td></tr>
+          <tr><td>相手の必要勝率（ポットオッズ）</td><td class="v">約 33%</td></tr>
+          <tr><td>あなたの本物（バリュー）</td><td class="v grn">約 66%</td></tr>
+          <tr><td>あなたのブラフ</td><td class="v exp">約 34%（1/3）</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- 10 無差別 -->
+    <section class="slide center">
+      <div class="kicker">ブラフをちょうど1/3にすると…</div>
+      <h1 class="big">相手は<br>コールしても・降りても<br><span class="gold">期待値が同じ</span></h1>
+      <div class="panel">
+        <p class="lead"><strong class="gold">インディファレンス（無差別）</strong>　＝　相手が利益を絞り取れない状態</p>
+      </div>
+      <p class="lead muted">じゃんけんで1/3ずつにするのと、まったく同じ発想。</p>
+    </section>
+
+    <!-- 11 GTOは土台 -->
+    <section class="slide center">
+      <div class="kicker">よくある誤解</div>
+      <h2>「GTOだけ覚えれば最強では？」</h2>
+      <div class="panel">
+        <p class="lead">GTOは<span class="grn">搾取されない</span>。<br>でも裏を返せば、相手のミスを<span class="exp">最大限は搾取しない</span>。</p>
+      </div>
+    </section>
+
+    <!-- 12 GTO vs エクスプロイト -->
+    <section class="slide">
+      <div class="kicker">2つの戦略の関係</div>
+      <div class="row">
+        <div class="col cmp g">
+          <h3 class="grn">GTO（守り）</h3>
+          <p>相手にどう動かれても搾取されない</p>
+          <p>正しい「真ん中」＝基準</p>
+          <p>相手が下手でも均衡を守るだけ</p>
+        </div>
+        <div class="col cmp e">
+          <h3 class="exp">エクスプロイト（攻め）</h3>
+          <p>相手のミスを最大限とがめる</p>
+          <p>ブラフ過多 → コール増／降り過多 → ブラフ増</p>
+          <p>偏る＝自分にも隙が生まれる</p>
+        </div>
+      </div>
+      <p class="lead center"><span class="gold">まずGTOを土台に。</span> そのうえで相手に応じて意図的にズラす。</p>
+    </section>
+
+    <!-- 13 なぜ今GTO -->
+    <section class="slide">
+      <div class="kicker">なぜ、今GTOなのか</div>
+      <ul>
+        <li><strong>ソルバー</strong>（GTOの答えを計算するソフト）の普及で、平均レベルが急上昇</li>
+        <li>強い相手ほど、GTOをベースに打ってくる</li>
+        <li>GTOは現代ポーカーの<span class="gold">「共通言語」</span></li>
+      </ul>
+      <p class="lead muted">※このシリーズは、難しいソルバー画面ではなく<strong>直感から</strong>積み上げます。</p>
+    </section>
+
+    <!-- 14 ロードマップ -->
+    <section class="slide">
+      <div class="kicker">シリーズ・ロードマップ</div>
+      <div class="road">
+        <div class="step"><div class="badge">1章</div><div><div class="t">基礎理論</div><div class="d">EV・エクイティ・ポジション・レンジ</div></div></div>
+        <div class="step"><div class="badge">2章</div><div><div class="t">プリフロップGTO</div><div class="d">オープン/3ベット/ディフェンス</div></div></div>
+        <div class="step"><div class="badge">3章</div><div><div class="t">フロップ</div><div class="d">Cベット・ボード・レンジ優位</div></div></div>
+        <div class="step"><div class="badge">4章</div><div><div class="t">ターン・リバー</div><div class="d">バレル・バリュー・無差別の深掘り</div></div></div>
+        <div class="step"><div class="badge">5章</div><div><div class="t">応用</div><div class="d">エクスプロイト・ICM・上達法</div></div></div>
+      </div>
+    </section>
+
+    <!-- 15 まとめ -->
+    <section class="slide">
+      <div class="kicker">今日のまとめ</div>
+      <ul class="num">
+        <li>GTOとは「相手にどう動かれても<span class="grn">搾取されない</span>、均衡の戦略」</li>
+        <li>均衡はベットの<span class="gold">バリュー:ブラフ比率</span>に現れ、相手を「無差別」に追い込む</li>
+        <li>GTOは<span class="grn">土台</span>、エクスプロイトはその上に乗せる<span class="exp">応用</span></li>
+      </ul>
+    </section>
+
+    <!-- 16 次回予告 -->
+    <section class="slide center">
+      <div class="kicker">次回予告</div>
+      <h1 class="big">第2回<br><span class="gold">期待値（EV）</span></h1>
+      <p class="lead muted">すべての判断を貫く、たった一つの物差し。<br>「正しく打ったのに負けた」のモヤモヤも、ここで晴れる。</p>
+    </section>
+
+    <!-- 17 CTA -->
+    <section class="slide center">
+      <h1 class="big"><span class="gold">チャンネル登録</span>＆<br>高評価をお願いします</h1>
+      <p class="lead muted">あなたの一手が、今日から少しだけ「理屈」で語れるものに。</p>
+    </section>
+
+    <!-- 18 エンド -->
+    <section class="slide center">
+      <div class="pill">ポーカー GTO 解説</div>
+      <h1>ご視聴ありがとうございました</h1>
+      <p class="lead gold">▶ 第2回「期待値（EV）」へ続く</p>
+    </section>
+
+    <div class="progress" id="progress"></div>
+    <div class="hud">
+      <div class="ep">Ep.1 ｜ GTOとは何か？</div>
+      <div><span id="cur">1</span> / <span id="total">18</span></div>
+    </div>
+  </div>
+</div>
+<div class="hint">→ / Space：次へ　　← ：戻る　　F：全画面　　Home/End：最初/最後</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let i = 0;
+  const curEl = document.getElementById('cur');
+  const totalEl = document.getElementById('total');
+  const bar = document.getElementById('progress');
+  totalEl.textContent = total;
+
+  function show(n){
+    i = Math.max(0, Math.min(total - 1, n));
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+    curEl.textContent = i + 1;
+    bar.style.width = ((i + 1) / total * 100) + '%';
+  }
+  function next(){ show(i + 1); }
+  function prev(){ show(i - 1); }
+
+  document.addEventListener('keydown', (e) => {
+    switch(e.key){
+      case 'ArrowRight': case ' ': case 'PageDown': e.preventDefault(); next(); break;
+      case 'ArrowLeft': case 'PageUp': e.preventDefault(); prev(); break;
+      case 'Home': e.preventDefault(); show(0); break;
+      case 'End': e.preventDefault(); show(total - 1); break;
+      case 'f': case 'F':
+        if(!document.fullscreenElement){ document.documentElement.requestFullscreen?.(); }
+        else{ document.exitFullscreen?.(); }
+        break;
+    }
+  });
+  // クリック/タップでも進む（画面左1/4で戻る）
+  document.querySelector('.stage').addEventListener('click', (e) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    if((e.clientX - r.left) < r.width * 0.25) prev(); else next();
+  });
+
+  show(0);
+</script>
+</body>
+</html>
