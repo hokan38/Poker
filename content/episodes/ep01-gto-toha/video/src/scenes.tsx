@@ -261,7 +261,7 @@ export const S08River: React.FC<SP> = ({ dur }) => {
       <TopKicker>直感例 II ・ リバー（実戦の場面）</TopKicker>
       <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", paddingTop: 30, paddingBottom: 130 }}>
         <div style={{ transform: "scale(0.92)" }}>
-          <PokerTable board={["Ks", "9s", "4d", "7h", "2d"]} hero={["Kh", "Qc"]} frame={frame} boardDelay={F(0.08)} heroDelay={F(0.36)} potDelay={F(0.56)} />
+          <PokerTable board={["As", "Kd", "8h", "4c", "2s"]} hero={["Qh", "Qc"]} frame={frame} boardDelay={F(0.08)} heroDelay={F(0.36)} potDelay={F(0.56)} />
         </div>
       </AbsoluteFill>
       <div style={{ position: "absolute", top: 150, right: 120, fontSize: 34, color: C.gold, fontWeight: 600, opacity: ramp(frame, F(0.36), F(0.46)) }}>あなた ＝ ブラフキャッチャー</div>
@@ -317,51 +317,64 @@ export const S09PotOdds: React.FC<SP> = ({ dur }) => {
   );
 };
 
-/* ============ 10 比率（2:1） ============ */
+/* ============ 10 コール判断：勝てるのはブラフ相手だけ → ブラフ頻度メーター ============ */
 export const S10Ratio: React.FC<SP> = ({ dur }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
-  const barS = ramp(frame, F(0.6), F(0.85));
-  const link = ramp(frame, F(0.78), F(0.92));
+  // 相手のブラフ頻度メーター（0→33%→100%）。針は分かれ目（33%）へ収束＝「ここが境目」。
+  const needle = interpolate(frame, [F(0.62), F(0.86)], [12, 33.3], { ...clamp, easing: EO });
+  const gauge = ramp(frame, F(0.5), F(0.66));
+  const outcome = (delay: number, cards: string[], label: string, res: string, col: string, win: boolean) => {
+    const s = spring({ frame: frame - delay, fps: 30, config: { damping: 16 } });
+    return (
+      <div style={{ flex: 1, opacity: interpolate(s, [0, 1], [0, 1]), transform: `translateY(${interpolate(s, [0, 1], [30, 0])}px)`, background: "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.012))", border: `1px solid ${col}66`, borderRadius: 18, padding: "24px 30px", display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+        <div style={{ fontSize: 30, color: C.inkSoft, fontWeight: 500 }}>{label}</div>
+        <div style={{ display: "flex", gap: 8 }}>{cards.map((c, i) => <Card key={i} card={c} w={96} frame={frame} delay={delay + 6 + i * 5} rise={30} float={false} />)}</div>
+        <div style={{ fontSize: 44, fontWeight: 700, color: col }}>{win ? "◎ " : "✕ "}{res}</div>
+      </div>
+    );
+  };
   return (
-    <Stage gap={40}>
-      <Kicker delay={2}>相手はどう打つべきか</Kicker>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 56, fontSize: 100, fontWeight: 700 }}>
-        <GradientText gradient={GRAD.gold} fontSize={100} weight={700} delay={F(0.06)}>バリュー 2</GradientText>
-        <span style={{ color: C.muted, fontFamily: LATIN }}>:</span>
-        <GradientText gradient={GRAD.silver} fontSize={100} weight={700} delay={F(0.16)}>ブラフ 1</GradientText>
+    <Stage gap={30}>
+      <Kicker delay={2}>コールすべき？ ・ 答え</Kicker>
+      <div style={{ fontSize: 52, fontWeight: 600, textAlign: "center", lineHeight: 1.3 }}>
+        あなたが勝てるのは、相手が<span style={{ color: C.gold, fontWeight: 700 }}>ブラフ</span>のときだけ
       </div>
-      <div style={{ display: "flex", gap: 70, alignItems: "flex-start", justifyContent: "center" }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-          <div style={{ display: "flex", gap: 34 }}>
-            <div style={{ display: "flex", gap: 10 }}>{["Kd", "Kc"].map((c, i) => <Card key={i} card={c} w={120} frame={frame} delay={F(0.24) + i * 5} rise={40} float={false} />)}</div>
-            <div style={{ display: "flex", gap: 10 }}>{["9h", "9d"].map((c, i) => <Card key={i} card={c} w={120} frame={frame} delay={F(0.36) + i * 5} rise={40} float={false} />)}</div>
+      <div style={{ display: "flex", gap: 60, alignItems: "stretch", justifyContent: "center", maxWidth: 1300, margin: "0 auto", width: "100%" }}>
+        {outcome(F(0.14), ["As", "Js"], "相手がブラフなら", "あなたの勝ち", C.gold, true)}
+        {outcome(F(0.3), ["Kd", "Kc"], "相手が本物なら", "あなたの負け", C.silver, false)}
+      </div>
+      {/* ブラフ頻度メーター：33%を境にコール／降りる */}
+      <div style={{ opacity: gauge, transform: `translateY(${(1 - gauge) * 16}px)`, maxWidth: 1200, margin: "6px auto 0", width: "100%" }}>
+        <div style={{ fontSize: 30, color: C.muted, textAlign: "center", marginBottom: 14 }}>相手のブラフ頻度</div>
+        <div style={{ position: "relative", height: 46 }}>
+          <div style={{ display: "flex", width: "100%", height: 46, borderRadius: 23, overflow: "hidden", border: `1px solid ${C.line}` }}>
+            <div style={{ width: "33.3%", background: GRAD.silver, display: "grid", placeItems: "center", fontSize: 28, fontWeight: 700, color: "#12100a" }}>降りる</div>
+            <div style={{ flex: 1, background: GRAD.gold, display: "grid", placeItems: "center", fontSize: 28, fontWeight: 700, color: "#12100a" }}>コール</div>
           </div>
-          <div style={{ fontSize: 32, color: C.gold, fontWeight: 600, letterSpacing: "0.08em" }}>バリュー（本物）</div>
+          {/* 33%の分かれ目 */}
+          <div style={{ position: "absolute", left: "33.3%", top: -12, bottom: -12, width: 3, background: C.ink }} />
+          <div style={{ position: "absolute", left: "33.3%", top: -46, transform: "translateX(-50%)", fontFamily: LATIN, fontSize: 30, fontWeight: 700, color: C.ink, whiteSpace: "nowrap" }}>33%</div>
+          {/* 針 */}
+          <div style={{ position: "absolute", left: `${needle}%`, top: -4, transform: "translateX(-50%)", width: 0, height: 0, borderLeft: "13px solid transparent", borderRight: "13px solid transparent", borderTop: `20px solid ${C.ink}` }} />
         </div>
-        <div style={{ width: 1, alignSelf: "stretch", background: C.line }} />
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-          <div style={{ display: "flex", gap: 10 }}>{["As", "Js"].map((c, i) => <Card key={i} card={c} w={120} frame={frame} delay={F(0.5) + i * 5} rise={40} float={false} />)}</div>
-          <div style={{ fontSize: 32, color: C.silver, fontWeight: 600, letterSpacing: "0.08em" }}>ブラフ</div>
+        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 14, fontSize: 26, color: C.muted }}>
+          <span>ブラフ少 → 降りる</span>
+          <span>ブラフ多 → コール</span>
         </div>
-      </div>
-      <div style={{ display: "flex", width: 1000, height: 30, borderRadius: 15, overflow: "hidden", border: `1px solid ${C.line}`, margin: "0 auto" }}>
-        <div style={{ width: `${barS * 66.6}%`, background: GRAD.gold }} />
-        <div style={{ flex: 1, background: GRAD.silver }} />
-      </div>
-      <div style={{ textAlign: "center", opacity: link, transform: `translateY(${(1 - link) * 14}px)`, fontSize: 42, fontWeight: 600 }}>
-        あなたが勝てるのは <span style={{ color: C.silver }}>3回に1回</span> <span style={{ color: C.muted }}>＝</span> <span style={{ color: C.gold }}>あの33%と同じ</span>
       </div>
     </Stage>
   );
 };
 
-/* ============ 11 無差別：傾いた天秤が水平に settle（一度きり） ============ */
+/* ============ 11 均衡：相手が2:1で混ぜる → 天秤が水平に settle（一度きり） ============ */
 export const S11Indiff: React.FC<SP> = ({ dur }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
+  const mixBar = ramp(frame, F(0.06), F(0.24));
+  const result = ramp(frame, F(0.26), F(0.4));
   // -12度に傾いた状態から水平へ、少しオーバーシュートして止まる
-  const s = spring({ frame: frame - F(0.15), fps: 30, config: { damping: 9, stiffness: 60 } });
+  const s = spring({ frame: frame - F(0.42), fps: 30, config: { damping: 9, stiffness: 60 } });
   const ang = interpolate(s, [0, 1], [-12, 0]);
   const CX = 960;
   const pan = (label: string, side: number) => (
@@ -373,17 +386,25 @@ export const S11Indiff: React.FC<SP> = ({ dur }) => {
   return (
     <AbsoluteFill style={{ fontFamily: FONT }}>
       <TopKicker>均衡点 ・ インディファレンス</TopKicker>
-      <div style={{ position: "absolute", top: 172, left: 0, right: 0, textAlign: "center", fontSize: 40, color: C.inkSoft, fontWeight: 500, opacity: ramp(frame, F(0.08), F(0.24)) }}>
-        勝てるのは <span style={{ color: C.gold, fontWeight: 700 }}>3回に1回</span> <span style={{ color: C.muted, fontFamily: LATIN }}>→</span> コールはちょうど<span style={{ color: C.gold, fontWeight: 700 }}>トントン</span>
+      {/* 相手のベット＝バリュー2:ブラフ1 */}
+      <div style={{ position: "absolute", top: 148, left: 0, right: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 12, opacity: mixBar, transform: `translateY(${(1 - mixBar) * 14}px)` }}>
+        <div style={{ fontSize: 34, color: C.inkSoft, fontWeight: 500 }}>相手のベット <span style={{ color: C.gold, fontWeight: 700 }}>バリュー 2</span> <span style={{ color: C.muted }}>:</span> <span style={{ color: C.silver, fontWeight: 700 }}>ブラフ 1</span></div>
+        <div style={{ display: "flex", width: 900, height: 34, borderRadius: 17, overflow: "hidden", border: `1px solid ${C.line}` }}>
+          <div style={{ width: "66.6%", background: GRAD.gold }} />
+          <div style={{ flex: 1, background: GRAD.silver }} />
+        </div>
       </div>
-      <div style={{ position: "absolute", top: 250, left: 0, right: 0, height: 340 }}>
+      <div style={{ position: "absolute", top: 246, left: 0, right: 0, textAlign: "center", fontSize: 38, color: C.inkSoft, fontWeight: 500, opacity: result }}>
+        <span style={{ color: C.muted, fontFamily: LATIN }}>→</span> あなたが勝てるのは <span style={{ color: C.gold, fontWeight: 700 }}>ちょうど3回に1回</span> <span style={{ color: C.muted, fontFamily: LATIN }}>＝</span> コールはトントン
+      </div>
+      <div style={{ position: "absolute", top: 320, left: 0, right: 0, height: 340 }}>
         <div style={{ position: "absolute", left: CX - 5, top: 60, width: 10, height: 220, background: C.line }} />
         <div style={{ position: "absolute", left: CX - 80, top: 278, width: 160, height: 18, borderRadius: 8, background: C.line }} />
         <div style={{ position: "absolute", left: CX - 300, top: 96, width: 600, height: 10, background: GRAD.gold, borderRadius: 5, transform: `rotate(${ang}deg)`, transformOrigin: "center" }} />
         {pan("コール", -1)}
         {pan("降りる", 1)}
       </div>
-      <div style={{ position: "absolute", bottom: 200, left: 0, right: 0, textAlign: "center" }}><Stamp delay={F(0.55)} fontSize={70}>無差別 ・ EV は同じ</Stamp></div>
+      <div style={{ position: "absolute", bottom: 150, left: 0, right: 0, textAlign: "center" }}><Stamp delay={F(0.72)} fontSize={64}>無差別 ・ EV は同じ</Stamp></div>
     </AbsoluteFill>
   );
 };

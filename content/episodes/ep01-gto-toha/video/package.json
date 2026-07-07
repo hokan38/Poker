@@ -4,9 +4,9 @@
   "private": true,
   "description": "Remotion project: Poker GTO series Episode 1 (auto-generated MP4 with narration)",
   "scripts": {
-    "render": "remotion render Episode1 out/ep01-gto-toha.mp4 --browser-executable=/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+    "render": "remotion render Episode1 out/ep01-gto-toha.mp4 --browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell",
     "studio": "remotion studio",
-    "still": "remotion still Episode1 out/still.png --browser-executable=/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
+    "still": "remotion still Episode1 out/still.png --browser-executable=/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell"
   },
   "dependencies": {
     "@fontsource/cormorant-garamond": "^5.2.11",

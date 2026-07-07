@@ -59,9 +59,9 @@ export const PokerTable: React.FC<{
       }} />
       <div style={{ position: "absolute", inset: 22, borderRadius: "50%", border: "1px solid rgba(200,169,107,0.35)" }} />
       {/* 相手の席（カードは伏せず表示しない） */}
-      <div style={{ position: "absolute", top: 56, left: 0, right: 0, textAlign: "center", fontFamily: LATIN, fontSize: 30, letterSpacing: "0.22em", color: "rgba(255,255,255,0.55)" }}>OPPONENT</div>
+      <div style={{ position: "absolute", top: 40, left: 0, right: 0, textAlign: "center", fontFamily: LATIN, fontSize: 30, letterSpacing: "0.22em", color: "rgba(255,255,255,0.55)" }}>OPPONENT</div>
       {/* ポット */}
-      <div style={{ position: "absolute", top: 200, left: 0, right: 0, display: "flex", justifyContent: "center", opacity: interpolate(potS, [0, 1], [0, 1]), transform: `translateY(${interpolate(potS, [0, 1], [20, 0])}px)` }}>
+      <div style={{ position: "absolute", top: 138, left: 0, right: 0, display: "flex", justifyContent: "center", opacity: interpolate(potS, [0, 1], [0, 1]), transform: `translateY(${interpolate(potS, [0, 1], [20, 0])}px)` }}>
         <div style={{ position: "relative", width: 120, height: 60 }}>
           {[0, 1, 2, 3, 4].map((k) => (
             <div key={k} style={{ position: "absolute", left: (k % 2) * 40 + 20, bottom: Math.floor(k / 2) * 12, width: 60, height: 18, borderRadius: "50%", background: "radial-gradient(circle at 40% 30%, #2a2a2c, #101012 70%)", border: `2px solid ${C.gold}` }} />
@@ -70,11 +70,11 @@ export const PokerTable: React.FC<{
         </div>
       </div>
       {/* ボード（中央） */}
-      <div style={{ position: "absolute", top: 300, left: 0, right: 0, display: "flex", justifyContent: "center", gap: 14 }}>
+      <div style={{ position: "absolute", top: 236, left: 0, right: 0, display: "flex", justifyContent: "center", gap: 14 }}>
         {board.map((c, i) => <Card key={i} card={c} w={cardW} frame={frame} delay={boardDelay + i * 6} rise={70} />)}
       </div>
-      {/* ヒーロー（手前） */}
-      <div style={{ position: "absolute", bottom: -34, left: 0, right: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+      {/* ヒーロー（手前・ボードの下） */}
+      <div style={{ position: "absolute", bottom: -78, left: 0, right: 0, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
         <div style={{ display: "flex", gap: 12 }}>
           {hero.map((c, i) => <Card key={i} card={c} w={cardW + 8} frame={frame} delay={heroDelay + i * 6} rise={70} ring={C.gold} />)}
         </div>
