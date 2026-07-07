@@ -1,8 +1,8 @@
 import React from "react";
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { C, FONT } from "./theme";
+import { C, FONT, GRAD } from "./theme";
 import { Card, CardRow } from "./components/Card";
-import { Bar, ChipStack, Donut, Kicker, Panel, Reveal, Stamp } from "./components/ui";
+import { Bar, ChipStack, Donut, GradientText, Kicker, LightSweep, Panel, Reveal, Stamp } from "./components/ui";
 
 const Stage: React.FC<{ children: React.ReactNode; justify?: string; gap?: number }> = ({
   children, justify = "center", gap = 34,
@@ -26,16 +26,11 @@ export const S01Title: React.FC = () => {
     <AbsoluteFill style={{ fontFamily: FONT }}>
       <Stage gap={30}>
         <Reveal delay={2}><Pill>ポーカー GTO 解説　・　全30回シリーズ</Pill></Reveal>
-        <Reveal delay={8}>
-          <div style={{ fontSize: 118, fontWeight: 900, lineHeight: 1.08 }}>
-            <span style={{ color: C.ink }}>GTO</span>
-            <span style={{ color: C.ink }}>とは何か？</span>
-          </div>
-        </Reveal>
-        <Reveal delay={16}>
-          <div style={{ fontSize: 96, fontWeight: 900, color: C.gold, lineHeight: 1.1 }}>ポーカー戦略の全体像</div>
-        </Reveal>
-        <Reveal delay={26}>
+        <LightSweep delay={26} duration={48}>
+          <GradientText gradient={GRAD.ink} fontSize={122} glowColor="rgba(255,255,255,0.22)" delay={8}>GTOとは何か？</GradientText>
+        </LightSweep>
+        <GradientText gradient={GRAD.gold} fontSize={98} glowColor="rgba(232,193,90,0.4)" delay={16}>ポーカー戦略の全体像</GradientText>
+        <Reveal delay={28}>
           <div style={{ fontSize: 42, color: C.muted }}>第1回 ｜ 本格的なポーカー戦略を、わかりやすく。</div>
         </Reveal>
       </Stage>
@@ -58,7 +53,7 @@ export const S02Hook: React.FC = () => (
       <div style={{ fontSize: 130, fontWeight: 900, display: "flex", alignItems: "center", gap: 40 }}>
         <span style={{ color: C.muted }}>運？</span>
         <span style={{ color: C.gold, fontSize: 70 }}>→</span>
-        <span style={{ color: C.green }}>戦略</span>
+        <GradientText gradient={GRAD.green} fontSize={140} glowColor="rgba(94,240,166,0.4)" delay={16}>戦略</GradientText>
       </div>
     </Reveal>
     <div style={{ display: "flex", alignItems: "flex-end", gap: 60, marginTop: 10 }}>
@@ -188,8 +183,10 @@ export const S06Ratio: React.FC = () => {
     <Stage gap={24}>
       <Kicker delay={2}>理論上の正解</Kicker>
       <Reveal delay={8}>
-        <div style={{ fontSize: 84, fontWeight: 900 }}>
-          <span style={{ color: C.green }}>バリュー 2</span>　：　<span style={{ color: C.exploit }}>ブラフ 1</span>
+        <div style={{ fontSize: 92, fontWeight: 900, display: "flex", alignItems: "center", gap: 8 }}>
+          <GradientText gradient={GRAD.green} fontSize={92} glowColor="rgba(94,240,166,0.35)" delay={10}>バリュー 2</GradientText>
+          <span style={{ color: C.ink, margin: "0 20px" }}>：</span>
+          <GradientText gradient={GRAD.exploit} fontSize={92} glowColor="rgba(255,176,122,0.35)" delay={16}>ブラフ 1</GradientText>
         </div>
       </Reveal>
       <div style={{ display: "flex", gap: 40, alignItems: "flex-start" }}>
