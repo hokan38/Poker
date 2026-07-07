@@ -9,14 +9,31 @@
 content/
 ├── README.md            ← このファイル（制作ガイド）
 ├── series-plan.md       ← 全30回のマスタープラン（章立て・各回の狙い）
+├── sources/             ← 情報源の基盤（ファクトチェック・出典運用）
+│   ├── README.md            … ソーシング基準（裏付けルール）
+│   ├── reference-library.md … 精査済みソース集（Tier付き）
+│   └── episode-source-map.md… 各回に割り当てる主ソース
 └── episodes/
     └── ep01-gto-toha/   ← 第1作
         ├── script.md    ← 収録台本（ナレーション／画面表示／図解指示・尺つき）
         ├── slides.html  ← 録画用スライド（自己完結・オフライン動作）
-        └── metadata.md  ← タイトル案／概要欄／タグ／チャプター／サムネ案
+        ├── metadata.md  ← タイトル案／概要欄／タグ／チャプター／サムネ案
+        └── video/       ← Remotionで自動生成する動画版（MP4・日本語ナレーション）
 ```
 
-各エピソードは `episodes/epNN-スラッグ/` に3点セット（`script.md` / `slides.html` / `metadata.md`）で置きます。
+各エピソードは `episodes/epNN-スラッグ/` に台本・スライド・メタデータ（＋動画版）で置きます。
+
+## 情報源・ファクトチェック
+
+「本格的なGTO解説」を掲げるため、**主張は必ず裏付けを持つ**ことを前提にします。
+専門的・数値的な回ほど厳格に。詳細は **`sources/`** を参照：
+
+- `sources/README.md` … 出典の格付け（Tier）と、各回の裏付けフロー
+- `sources/reference-library.md` … 書籍・査読論文・ソルバー・教育サイトの精査済みリスト
+- `sources/episode-source-map.md` … 各回で参照する主ソース
+
+原則：**数値（頻度・サイズ・EV・レンジ）はソルバー（Tier 1）で確定し、前提条件を必ず併記**。
+導出できる数学は台本内に導出を書く。二次情報だけで意外な主張を断定しない。
 
 ## 収録の手順
 
