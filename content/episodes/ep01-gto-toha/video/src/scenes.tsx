@@ -6,11 +6,15 @@ import { Card, CardRow } from "./components/Card";
 import { GradientText, Kicker, Reveal, Stamp } from "./components/ui";
 import { HandIcon, PokerTable } from "./components/parts";
 
-type SP = { dur: number };
+type Beats = Record<string, number>;
+type SP = { dur: number; beats?: Beats };
 const EO = Easing.out(Easing.cubic);
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 // 一度きりのイージング補間（frame a→b を 0→1）
 const ramp = (frame: number, a: number, b: number) => interpolate(frame, [a, b], [0, 1], { ...clamp, easing: EO });
+// ビート解決：ナレーション実測フレーム(beats[name])があればそれ、無ければ従来の割合 F(fb)。
+const beatAt = (beats: Beats | undefined, name: string, fallback: number) =>
+  beats && beats[name] != null ? beats[name] : fallback;
 
 const Stage: React.FC<{ children: React.ReactNode; justify?: string; gap?: number }> = ({
   children, justify = "center", gap = 46,
@@ -54,14 +58,18 @@ export const S01Title: React.FC<SP> = ({ dur }) => {
 };
 
 /* ============ 02 フック：運→戦略（× 消し・置換・上昇チャート・積み上げ） ============ */
-export const S02Hook: React.FC<SP> = ({ dur }) => {
+export const S02Hook: React.FC<SP> = ({ dur, beats }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
-  const un = interpolate(frame, [F(0.34), F(0.46)], [1, 0.18], clamp);
-  const strike = ramp(frame, F(0.28), F(0.42)) * 100;
-  const senS = spring({ frame: frame - F(0.46), fps: 30, config: { damping: 13, stiffness: 130 } });
-  const draw = ramp(frame, F(0.5), F(0.96));      // 上昇チャートの描画
-  const stackN = Math.floor(interpolate(frame, [F(0.52), F(0.96)], [0, 9], clamp));
+  const B = (n: string, fb: number) => beatAt(beats, n, F(fb));
+  // 「運で勝っているのでは」で運が消え、「明確な戦略」で戦略が立ち上がる
+  const u0 = B("unluck", 0.28);
+  const s0 = B("senryaku", 0.46);
+  const un = interpolate(frame, [u0, s0], [1, 0.18], clamp);
+  const strike = ramp(frame, u0, s0) * 100;
+  const senS = spring({ frame: frame - s0, fps: 30, config: { damping: 13, stiffness: 130 } });
+  const draw = ramp(frame, s0 + 20, F(0.98));      // 上昇チャートの描画（戦略のあと）
+  const stackN = Math.floor(interpolate(frame, [s0 + 30, F(0.98)], [0, 9], clamp));
   const LEN = 660;
   return (
     <Stage gap={40}>
@@ -73,7 +81,7 @@ export const S02Hook: React.FC<SP> = ({ dur }) => {
         </div>
         <span style={{ fontFamily: LATIN, color: C.gold, fontWeight: 300, fontSize: 90, opacity: interpolate(senS, [0, 0.4], [0, 1], clamp) }}>→</span>
         <div style={{ opacity: interpolate(senS, [0, 0.5], [0, 1], clamp), transform: `scale(${interpolate(senS, [0, 1], [0.6, 1])})` }}>
-          <GradientText gradient={GRAD.gold} fontSize={168} weight={700} delay={F(0.46)}>戦略</GradientText>
+          <GradientText gradient={GRAD.gold} fontSize={168} weight={700} delay={s0}>戦略</GradientText>
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "flex-end", gap: 120, height: 300, marginTop: 10 }}>
@@ -120,18 +128,21 @@ export const S03Series: React.FC<SP> = ({ dur }) => {
 };
 
 /* ============ 04 定義：文字が集合＋下線ドロー＋スタンプ ============ */
-export const S04Def: React.FC<SP> = ({ dur }) => {
+export const S04Def: React.FC<SP> = ({ dur, beats }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
+  const B = (n: string, fb: number) => beatAt(beats, n, F(fb));
   const words = ["Game", "Theory", "Optimal"];
   const scatter = [[-260, -120], [0, 160], [280, -140]];
-  const under = ramp(frame, F(0.42), F(0.62)) * 100;
+  const wl = B("letters", 0.05);            // 「ゲーム・セオリー・オプティマル」で文字が集合
+  const op = B("optimal", 0.42);            // 「最適な戦略」で下線が引かれる
+  const under = ramp(frame, op, op + 40) * 100;
   return (
     <Stage gap={48}>
       <Kicker delay={2}>GTO とは</Kicker>
       <div style={{ position: "relative", fontFamily: LATIN, fontSize: 150, fontWeight: 600, letterSpacing: "0.02em", display: "flex", gap: 30 }}>
         {words.map((w, i) => {
-          const s = spring({ frame: frame - F(0.05 + i * 0.12), fps: 30, config: { damping: 15 } });
+          const s = spring({ frame: frame - (wl + i * 18), fps: 30, config: { damping: 15 } });
           return (
             <span key={i} style={{ display: "inline-block", color: i < 3 ? C.gold : C.ink, opacity: interpolate(s, [0, 1], [0, 1]), transform: `translate(${scatter[i][0] * (1 - s)}px, ${scatter[i][1] * (1 - s)}px) rotate(${(1 - s) * (i - 1) * 8}deg)` }}>
               <span style={{ color: C.gold }}>{w[0]}</span><span style={{ color: C.ink }}>{w.slice(1)}</span>
@@ -140,7 +151,7 @@ export const S04Def: React.FC<SP> = ({ dur }) => {
         })}
         <div style={{ position: "absolute", bottom: -18, left: 0, width: `${under}%`, height: 4, background: C.gold }} />
       </div>
-      <div style={{ marginTop: 20 }}><Stamp delay={F(0.66)} fontSize={80}>＝ 搾取されない戦略</Stamp></div>
+      <div style={{ marginTop: 20 }}><Stamp delay={op + 90} fontSize={80}>＝ 搾取されない戦略</Stamp></div>
     </Stage>
   );
 };
@@ -184,14 +195,16 @@ export const S05Shield: React.FC<SP> = ({ dur }) => {
 };
 
 /* ============ 06 じゃんけん：減速して止まるルーレット ============ */
-export const S06Janken: React.FC<SP> = ({ dur }) => {
+export const S06Janken: React.FC<SP> = ({ dur, beats }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
+  const B = (n: string, fb: number) => beatAt(beats, n, F(fb));
   const kinds: ("rock" | "scissors" | "paper")[] = ["rock", "scissors", "paper"];
   const labels = ["グー", "チョキ", "パー"];
   const cols = [C.ink, C.gold, C.silver];
-  // 回転量：速く回って減速し止まる（ループしない）
-  const spin = interpolate(frame, [F(0.18), F(0.72)], [0, 26], { ...clamp, easing: Easing.out(Easing.poly(4)) });
+  const kinko = B("kinko", 0.8);   // 「均衡です」で均衡テロップ
+  // 回転量：速く回って減速し、均衡テロップ直前で止まる（ループしない）
+  const spin = interpolate(frame, [F(0.18), kinko - 40], [0, 26], { ...clamp, easing: Easing.out(Easing.poly(4)) });
   const sel = Math.floor(spin) % 3;
   const seg = 120;
   return (
@@ -216,18 +229,22 @@ export const S06Janken: React.FC<SP> = ({ dur }) => {
           ))}
         </div>
       </div>
-      <Reveal delay={F(0.8)}><div style={{ fontSize: 48, fontWeight: 600, textAlign: "center" }}>均衡 <span style={{ color: C.muted, fontSize: 36 }}>＝ 誰にも打ち負かされない</span></div></Reveal>
+      <Reveal delay={kinko}><div style={{ fontSize: 48, fontWeight: 600, textAlign: "center" }}>均衡 <span style={{ color: C.muted, fontSize: 36 }}>＝ 誰にも打ち負かされない</span></div></Reveal>
     </Stage>
   );
 };
 
 /* ============ 07 偏り→搾取：バー成長＋一度きりのチップ流出 ============ */
-export const S07Bias: React.FC<SP> = ({ dur }) => {
+export const S07Bias: React.FC<SP> = ({ dur, beats }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
-  const you = interpolate(frame, [F(0.06), F(0.42)], [0.33, 0.66], { ...clamp, easing: EO });
-  const opp = interpolate(frame, [F(0.34), F(0.72)], [0.33, 0.76], { ...clamp, easing: EO });
-  const flow = Array.from({ length: 6 }).map((_, k) => F(0.4 + k * 0.05));
+  const B = (n: string, fb: number) => beatAt(beats, n, F(fb));
+  const yb = B("youbias", 0.06);      // 「グーを多めに」で自分のバーが伸びる
+  const ob = B("oppraise", 0.34);     // 「パーを増やして」で相手のバーが伸びる
+  const eb = B("exploited", 0.4);     // 「搾取され」でチップが流出
+  const you = interpolate(frame, [yb, yb + 150], [0.33, 0.66], { ...clamp, easing: EO });
+  const opp = interpolate(frame, [ob, ob + 150], [0.33, 0.76], { ...clamp, easing: EO });
+  const flow = Array.from({ length: 6 }).map((_, k) => eb + k * 8);
   const col = (label: string, h: number, grad: string, color: string, kind: "rock" | "paper") => (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
       <HandIcon kind={kind} size={100} color={color} />
@@ -247,38 +264,45 @@ export const S07Bias: React.FC<SP> = ({ dur }) => {
           return <div key={k} style={{ position: "absolute", left: interpolate(p, [0, 1], [660, 1160]), top: interpolate(p, [0, 0.5, 1], [130, 60, 130]), opacity: interpolate(p, [0, 0.15, 0.85, 1], [0, 1, 1, 0]) }}><Chip size={44} gold /></div>;
         })}
       </div>
-      <Reveal delay={F(0.5)}><div style={{ fontSize: 72, fontWeight: 700, textAlign: "center" }}><span style={{ color: C.gold }}>偏り</span> <span style={{ color: C.muted, fontFamily: LATIN }}>→</span> <span style={{ color: C.silver }}>搾取される</span></div></Reveal>
+      <Reveal delay={eb}><div style={{ fontSize: 72, fontWeight: 700, textAlign: "center" }}><span style={{ color: C.gold }}>偏り</span> <span style={{ color: C.muted, fontFamily: LATIN }}>→</span> <span style={{ color: C.silver }}>搾取される</span></div></Reveal>
     </Stage>
   );
 };
 
 /* ============ 08 リバー（ポーカーテーブル） ============ */
-export const S08River: React.FC<SP> = ({ dur }) => {
+export const S08River: React.FC<SP> = ({ dur, beats }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
+  const B = (n: string, fb: number) => beatAt(beats, n, F(fb));
+  // ボード=「ボードは」, 手札=「あなたの手札は」, 危険盤面=「スペードのフラッシュ」,
+  // トップペア=「トップペアです」, ベット=「ポットと同じ金額」
+  const board = B("board", 0.08), hero = B("hero", 0.36), pot = B("pot", 0.56);
+  const toppair = B("toppair", 0.36), danger = B("danger", 0.12);
   return (
     <AbsoluteFill style={{ fontFamily: FONT }}>
       <TopKicker>直感例 II ・ リバー（実戦の場面）</TopKicker>
       <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", paddingTop: 30, paddingBottom: 130 }}>
         <div style={{ transform: "scale(0.92)" }}>
-          <PokerTable board={["Ks", "Ts", "9s", "8d", "3h"]} hero={["Ah", "Kd"]} frame={frame} boardDelay={F(0.08)} heroDelay={F(0.36)} potDelay={F(0.56)} />
+          <PokerTable board={["Ks", "Ts", "9s", "8d", "3h"]} hero={["Ah", "Kd"]} frame={frame} boardDelay={board} heroDelay={hero} potDelay={pot} />
         </div>
       </AbsoluteFill>
-      <div style={{ position: "absolute", top: 150, right: 110, textAlign: "right", fontSize: 34, color: C.gold, fontWeight: 600, opacity: ramp(frame, F(0.36), F(0.46)), lineHeight: 1.4 }}>あなた ＝ Kのトップペア<br /><span style={{ fontSize: 27, color: C.inkSoft }}>ブラフキャッチャー</span></div>
-      <div style={{ position: "absolute", top: 150, left: 110, fontSize: 30, color: C.silver, fontWeight: 500, opacity: ramp(frame, F(0.12), F(0.24)), lineHeight: 1.4 }}>♠フラッシュ<br />ストレートが<br />ありうる盤面</div>
+      <div style={{ position: "absolute", top: 150, right: 110, textAlign: "right", fontSize: 34, color: C.gold, fontWeight: 600, opacity: ramp(frame, toppair, toppair + 30), lineHeight: 1.4 }}>あなた ＝ Kのトップペア<br /><span style={{ fontSize: 27, color: C.inkSoft }}>ブラフキャッチャー</span></div>
+      <div style={{ position: "absolute", top: 150, left: 110, fontSize: 30, color: C.silver, fontWeight: 500, opacity: ramp(frame, danger, danger + 30), lineHeight: 1.4 }}>♠フラッシュ<br />ストレートが<br />ありうる盤面</div>
     </AbsoluteFill>
   );
 };
 
 /* ============ 09 ポットオッズ（計算・bb） ============ */
-export const S09PotOdds: React.FC<SP> = ({ dur }) => {
+export const S09PotOdds: React.FC<SP> = ({ dur, beats }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
-  const t = [F(0.12), F(0.26), F(0.44)];
+  const B = (n: string, fb: number) => beatAt(beats, n, F(fb));
+  // 「ポットには100」「相手が同じ100」「あなたは100…払って」でスタックが積まれる
+  const t = [B("s1", 0.12), B("s2", 0.26), B("s3", 0.44)];
   const count = t.filter((tt) => frame >= tt).length;
   const total = count * 100;
-  const fEq = spring({ frame: frame - F(0.6), fps: 30, config: { damping: 200 } });
-  const fPct = spring({ frame: frame - F(0.78), fps: 30, config: { damping: 200 } });
+  const fEq = spring({ frame: frame - B("eq", 0.6), fps: 30, config: { damping: 200 } });   // 100/300
+  const fPct = spring({ frame: frame - B("pct", 0.78), fps: 30, config: { damping: 200 } }); // 33%
   const labels = ["ポット 100", "相手 100", "あなた 100"];
   return (
     <Stage gap={30}>
@@ -306,7 +330,7 @@ export const S09PotOdds: React.FC<SP> = ({ dur }) => {
           </div>
           <div style={{ marginTop: 18, display: "flex", alignItems: "center", gap: 20, opacity: interpolate(fPct, [0, 1], [0, 1]) }}>
             <span style={{ fontSize: 40, color: C.inkSoft }}>≒</span>
-            <GradientText gradient={GRAD.gold} fontSize={104} weight={700} delay={F(0.78)}>33%</GradientText>
+            <GradientText gradient={GRAD.gold} fontSize={104} weight={700} delay={B("pct", 0.78)}>33%</GradientText>
           </div>
           <div style={{ marginTop: 22, display: "flex", gap: 14, alignItems: "center", opacity: interpolate(fPct, [0, 1], [0, 1]) }}>
             {[0, 1, 2].map((k) => <div key={k} style={{ width: 40, height: 40, borderRadius: "50%", background: k === 0 ? C.gold : "transparent", border: `2px solid ${C.gold}` }} />)}
@@ -319,13 +343,16 @@ export const S09PotOdds: React.FC<SP> = ({ dur }) => {
 };
 
 /* ============ 10 コール判断：勝てるのはブラフ相手だけ → ブラフ頻度メーター ============ */
-export const S10Ratio: React.FC<SP> = ({ dur }) => {
+export const S10Ratio: React.FC<SP> = ({ dur, beats }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
+  const B = (n: string, fb: number) => beatAt(beats, n, F(fb));
+  const bd = B("bridge", 0.42);   // 「勝てる割合は、相手が…」で橋渡し
+  const pc = B("pct", 0.66);      // 「33パーセントを超える」でメーターが確定
   // 相手のブラフ頻度メーター（0→33%→100%）。針は分かれ目（33%）へ収束＝「ここが境目」。
-  const needle = interpolate(frame, [F(0.66), F(0.88)], [12, 33.3], { ...clamp, easing: EO });
-  const bridge = ramp(frame, F(0.42), F(0.54));
-  const gauge = ramp(frame, F(0.56), F(0.7));
+  const needle = interpolate(frame, [pc - 110, pc], [12, 33.3], { ...clamp, easing: EO });
+  const bridge = ramp(frame, bd, bd + 50);
+  const gauge = ramp(frame, bd + 70, bd + 150);
   const outcome = (delay: number, cards: string[], label: string, res: string, col: string, win: boolean) => {
     const s = spring({ frame: frame - delay, fps: 30, config: { damping: 16 } });
     return (
@@ -343,8 +370,8 @@ export const S10Ratio: React.FC<SP> = ({ dur }) => {
         あなたが勝てるのは、相手が<span style={{ color: C.gold, fontWeight: 700 }}>ブラフ</span>のときだけ
       </div>
       <div style={{ display: "flex", gap: 60, alignItems: "stretch", justifyContent: "center", maxWidth: 1300, margin: "0 auto", width: "100%" }}>
-        {outcome(F(0.14), ["6c", "5h"], "相手がブラフなら", "あなたの勝ち", C.gold, true)}
-        {outcome(F(0.3), ["Qd", "Jd"], "相手がストレートやフラッシュなら", "あなたの負け", C.silver, false)}
+        {outcome(B("win", 0.14), ["6c", "5h"], "相手がブラフなら", "あなたの勝ち", C.gold, true)}
+        {outcome(B("lose", 0.3), ["Qd", "Jd"], "相手がストレートやフラッシュなら", "あなたの負け", C.silver, false)}
       </div>
       {/* 勝てる割合＝相手のブラフの割合、という橋渡し（＋EQの紹介） */}
       <div style={{ textAlign: "center", opacity: bridge, transform: `translateY(${(1 - bridge) * 12}px)` }}>
@@ -379,13 +406,17 @@ export const S10Ratio: React.FC<SP> = ({ dur }) => {
 };
 
 /* ============ 11 均衡：相手が2:1で混ぜる → 天秤が水平に settle（一度きり） ============ */
-export const S11Indiff: React.FC<SP> = ({ dur }) => {
+export const S11Indiff: React.FC<SP> = ({ dur, beats }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
-  const mixBar = ramp(frame, F(0.06), F(0.24));
-  const result = ramp(frame, F(0.26), F(0.4));
+  const B = (n: string, fb: number) => beatAt(beats, n, F(fb));
+  const mx = B("mix", 0.06);      // 「二対一で混ぜて」
+  const rs = B("result", 0.26);   // 「ちょうど三回に一回」
+  const bl = B("balance", 0.42);  // 「コールがトントン」で天秤が水平に
+  const mixBar = ramp(frame, mx, mx + 60);
+  const result = ramp(frame, rs, rs + 50);
   // -12度に傾いた状態から水平へ、少しオーバーシュートして止まる
-  const s = spring({ frame: frame - F(0.42), fps: 30, config: { damping: 9, stiffness: 60 } });
+  const s = spring({ frame: frame - bl, fps: 30, config: { damping: 9, stiffness: 60 } });
   const ang = interpolate(s, [0, 1], [-12, 0]);
   const CX = 960;
   const pan = (label: string, side: number) => (
@@ -415,17 +446,18 @@ export const S11Indiff: React.FC<SP> = ({ dur }) => {
         {pan("コール", -1)}
         {pan("降りる", 1)}
       </div>
-      <div style={{ position: "absolute", bottom: 190, left: 0, right: 0, textAlign: "center" }}><Stamp delay={F(0.72)} fontSize={60}>無差別 ・ EV（期待値）は同じ</Stamp></div>
+      <div style={{ position: "absolute", bottom: 190, left: 0, right: 0, textAlign: "center" }}><Stamp delay={B("indifferent", 0.72)} fontSize={60}>無差別 ・ EV（期待値）は同じ</Stamp></div>
     </AbsoluteFill>
   );
 };
 
 /* ============ 11b 結論：コールか降りか（明示） ============ */
-export const SVerdict: React.FC<SP> = ({ dur }) => {
+export const SVerdict: React.FC<SP> = ({ dur, beats }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
-  const a = spring({ frame: frame - F(0.12), fps: 30, config: { damping: 16 } });
-  const b = spring({ frame: frame - F(0.42), fps: 30, config: { damping: 16 } });
+  const B = (n: string, fb: number) => beatAt(beats, n, F(fb));
+  const a = spring({ frame: frame - B("same", 0.12), fps: 30, config: { damping: 16 } });   // 「まったく同じ価値」
+  const b = spring({ frame: frame - B("opts", 0.42), fps: 30, config: { damping: 16 } });   // 「二対一より多いと感じたら」
   const opt = (delay: number, title: string, sub: string, arrow: string, col: string) => {
     const s = spring({ frame: frame - delay, fps: 30, config: { damping: 16 } });
     return (
@@ -446,18 +478,20 @@ export const SVerdict: React.FC<SP> = ({ dur }) => {
       </div>
       {/* 実戦では相手のブラフ量で決まる */}
       <div style={{ display: "flex", gap: 44, justifyContent: "center", maxWidth: 1400, margin: "0 auto", width: "100%", opacity: interpolate(b, [0, 1], [0, 1]) }}>
-        {opt(F(0.44), "ブラフが多い相手", "2:1 より多い", "コール", C.gold)}
-        {opt(F(0.56), "ブラフが少ない相手", "2:1 より少ない", "降りる", C.silver)}
+        {opt(B("opts", 0.44), "ブラフが多い相手", "2:1 より多い", "コール", C.gold)}
+        {opt(B("opts", 0.44) + 40, "ブラフが少ない相手", "2:1 より少ない", "降りる", C.silver)}
       </div>
-      <div style={{ textAlign: "center" }}><Stamp delay={F(0.74)} fontSize={50}>決め手は、相手のブラフの量</Stamp></div>
+      <div style={{ textAlign: "center" }}><Stamp delay={B("decide", 0.74)} fontSize={50}>決め手は、相手のブラフの量</Stamp></div>
     </Stage>
   );
 };
 
 /* ============ 12 レンジ：1枚→扇に展開 ============ */
-export const S12Ranges: React.FC<SP> = ({ dur }) => {
+export const S12Ranges: React.FC<SP> = ({ dur, beats }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
+  const B = (n: string, fb: number) => beatAt(beats, n, F(fb));
+  const fan = B("fan", 0.36);   // 「ありえる手の範囲」で扇に展開
   const range = ["Ah", "Ks", "Qd", "Jc", "Ts", "9h", "8s", "7d"];
   return (
     <Stage gap={50}>
@@ -467,11 +501,11 @@ export const S12Ranges: React.FC<SP> = ({ dur }) => {
           <div style={{ fontSize: 34, color: C.silver }}>1つに決めつけ</div>
           <Card card="Kh" w={150} frame={frame} delay={F(0.08)} rise={40} dim float={false} />
         </div>
-        <div style={{ fontFamily: LATIN, fontSize: 90, color: C.muted, opacity: ramp(frame, F(0.24), F(0.34)) }}>→</div>
+        <div style={{ fontFamily: LATIN, fontSize: 90, color: C.muted, opacity: ramp(frame, fan - 40, fan) }}>→</div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
           <div style={{ fontSize: 36, color: C.gold, fontWeight: 600 }}>ありえる「範囲」</div>
           <div style={{ display: "flex" }}>
-            {range.map((c, i) => <div key={i} style={{ margin: "0 -20px", transform: `rotate(${(i - 3.5) * 7}deg)` }}><Card card={c} w={130} frame={frame} delay={F(0.36) + i * 7} rise={90} float={false} /></div>)}
+            {range.map((c, i) => <div key={i} style={{ margin: "0 -20px", transform: `rotate(${(i - 3.5) * 7}deg)` }}><Card card={c} w={130} frame={frame} delay={fan + i * 7} rise={90} float={false} /></div>)}
           </div>
         </div>
       </div>
@@ -480,9 +514,12 @@ export const S12Ranges: React.FC<SP> = ({ dur }) => {
 };
 
 /* ============ 13 GTO vs エクスプロイト：左右スライド＋積層の説明 ============ */
-export const S13Exploit: React.FC<SP> = ({ dur }) => {
+export const S13Exploit: React.FC<SP> = ({ dur, beats }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
+  const B = (n: string, fb: number) => beatAt(beats, n, F(fb));
+  const gto = B("gto", 0.1);     // 「誰にも搾取されない」でGTO守りパネル
+  const expl = B("expl", 0.28);  // 「エクスプロイト、搾取」で攻めパネル
   const panel = (delay: number, from: number, title: string, sub: string, col: string, kind: "rock" | "scissors") => {
     const s = spring({ frame: frame - delay, fps: 30, config: { damping: 16 } });
     return (
@@ -497,21 +534,23 @@ export const S13Exploit: React.FC<SP> = ({ dur }) => {
     <Stage gap={40}>
       <Kicker delay={2}>2つの戦略</Kicker>
       <div style={{ display: "flex", gap: 50, alignItems: "center" }}>
-        {panel(F(0.1), -140, "GTO ・ 守り", "搾取されない基準", C.gold, "rock")}
-        <div style={{ fontFamily: LATIN, fontSize: 60, color: C.muted, opacity: ramp(frame, F(0.4), F(0.5)) }}>＋</div>
-        {panel(F(0.28), 140, "エクスプロイト ・ 攻め", "相手のミスを突く", C.silver, "scissors")}
+        {panel(gto, -140, "GTO ・ 守り", "搾取されない基準", C.gold, "rock")}
+        <div style={{ fontFamily: LATIN, fontSize: 60, color: C.muted, opacity: ramp(frame, expl - 50, expl) }}>＋</div>
+        {panel(expl, 140, "エクスプロイト ・ 攻め", "相手のミスを突く", C.silver, "scissors")}
       </div>
-      <Reveal delay={F(0.62)}><div style={{ fontSize: 46, fontWeight: 500, textAlign: "center", color: C.inkSoft }}><span style={{ color: C.gold, fontWeight: 700 }}>土台</span>の上に<span style={{ color: C.silver, fontWeight: 700 }}>応用</span>を乗せる</div></Reveal>
+      <Reveal delay={expl + 60}><div style={{ fontSize: 46, fontWeight: 500, textAlign: "center", color: C.inkSoft }}><span style={{ color: C.gold, fontWeight: 700 }}>土台</span>の上に<span style={{ color: C.silver, fontWeight: 700 }}>応用</span>を乗せる</div></Reveal>
     </Stage>
   );
 };
 
 /* ============ 14 土台と応用：ブロックが落ちて積まれる ============ */
-export const S14Foundation: React.FC<SP> = ({ dur }) => {
+export const S14Foundation: React.FC<SP> = ({ dur, beats }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
+  const B = (n: string, fb: number) => beatAt(beats, n, F(fb));
+  // 土台(GTO)は早めに提示して画面を保たせ、応用ブロックの落下を「その上に乗せる」に同期
   const base = spring({ frame: frame - F(0.12), fps: 30, config: { damping: 16 } });
-  const drop = spring({ frame: frame - F(0.45), fps: 30, config: { damping: 11, stiffness: 110 } });
+  const drop = spring({ frame: frame - B("drop", 0.45), fps: 30, config: { damping: 11, stiffness: 110 } });
   return (
     <Stage justify="center" gap={22}>
       <Kicker delay={2}>順番が大切</Kicker>
@@ -528,16 +567,18 @@ export const S14Foundation: React.FC<SP> = ({ dur }) => {
 };
 
 /* ============ 15 なぜ今：年表が順に ============ */
-export const S15Solved: React.FC<SP> = ({ dur }) => {
+export const S15Solved: React.FC<SP> = ({ dur, beats }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
+  const B = (n: string, fb: number) => beatAt(beats, n, F(fb));
   const rows = [["2015", "Cepheus"], ["2017", "Libratus"], ["2019", "Pluribus"]];
+  const rowBeats = [B("y2015", 0.1), B("y2017", 0.3), B("y2019", 0.5)];  // 各西暦を読む瞬間に行が出る
   return (
     <Stage gap={34}>
       <Kicker delay={2}>なぜ今 ・ GTOは共通言語</Kicker>
       <div style={{ display: "flex", flexDirection: "column", gap: 24, maxWidth: 1500, margin: "0 auto", width: "100%" }}>
         {rows.map((r, i) => {
-          const s = spring({ frame: frame - F(0.1 + i * 0.2), fps: 30, config: { damping: 18 } });
+          const s = spring({ frame: frame - rowBeats[i], fps: 30, config: { damping: 18 } });
           return (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 40, padding: "18px 20px", borderBottom: `1px solid ${C.line}`, opacity: interpolate(s, [0, 1], [0, 1]), transform: `translateX(${interpolate(s, [0, 1], [-80, 0])}px)` }}>
               <span style={{ fontFamily: LATIN, fontSize: 72, fontWeight: 600, color: C.gold, width: 180 }}>{r[0]}</span>
@@ -549,26 +590,29 @@ export const S15Solved: React.FC<SP> = ({ dur }) => {
           );
         })}
       </div>
-      <Reveal delay={F(0.74)}><div style={{ fontSize: 64, fontWeight: 700, textAlign: "center" }}>GTO <span style={{ color: C.muted, fontSize: 44 }}>＝</span> <span style={{ color: C.gold }}>現代の共通言語</span></div></Reveal>
+      <Reveal delay={B("lang", 0.74)}><div style={{ fontSize: 64, fontWeight: 700, textAlign: "center" }}>GTO <span style={{ color: C.muted, fontSize: 44 }}>＝</span> <span style={{ color: C.gold }}>現代の共通言語</span></div></Reveal>
     </Stage>
   );
 };
 
 /* ============ 16 まとめ：順に現れる ============ */
-export const S16Summary: React.FC<SP> = ({ dur }) => {
+export const S16Summary: React.FC<SP> = ({ dur, beats }) => {
   const frame = useCurrentFrame();
   const F = (x: number) => Math.round(x * dur);
+  const B = (n: string, fb: number) => beatAt(beats, n, F(fb));
   const items = [
     { k: "均衡", d: "搾取されない", col: C.ink },
     { k: "2 : 1", d: "バリュー:ブラフ", col: C.gold },
     { k: "土台", d: "その上に応用", col: C.silver },
   ];
+  const itemBeats = [B("i1", 0.12), B("i2", 0.36), B("i3", 0.6)];  // 「ひとつ／ふたつ／みっつ」で各項目
+
   return (
     <Stage gap={54}>
       <Kicker delay={2}>今日のまとめ</Kicker>
       <div style={{ display: "flex", gap: 60, justifyContent: "center" }}>
         {items.map((it, i) => {
-          const s = spring({ frame: frame - F(0.12 + i * 0.24), fps: 30, config: { damping: 12, stiffness: 130 } });
+          const s = spring({ frame: frame - itemBeats[i], fps: 30, config: { damping: 12, stiffness: 130 } });
           return (
             <div key={i} style={{ flex: 1, textAlign: "center", opacity: interpolate(s, [0, 1], [0, 1]), transform: `scale(${interpolate(s, [0, 1], [0.7, 1])})` }}>
               <div style={{ fontFamily: LATIN, fontSize: 104, fontWeight: 700, color: it.col }}>{i + 1}</div>

@@ -14,6 +14,7 @@
       "audioFrames": 323,
       "leadInFrames": 12,
       "durationInFrames": 361,
+      "beats": {},
       "captions": [
         {
           "t": "本格的なポーカー戦略を",
@@ -45,6 +46,10 @@
       "audioFrames": 1313,
       "leadInFrames": 12,
       "durationInFrames": 1351,
+      "beats": {
+        "unluck": 687,
+        "senryaku": 791
+      },
       "captions": [
         {
           "t": "あなたの周りになぜか勝ち続けている人はいませんか。",
@@ -126,6 +131,7 @@
       "audioFrames": 644,
       "leadInFrames": 12,
       "durationInFrames": 682,
+      "beats": {},
       "captions": [
         {
           "t": "このチャンネルではポーカーの戦略を",
@@ -177,6 +183,10 @@
       "audioFrames": 993,
       "leadInFrames": 12,
       "durationInFrames": 1031,
+      "beats": {
+        "letters": 57,
+        "optimal": 219
+      },
       "captions": [
         {
           "t": "GTOとはゲーム・セオリー・オプティマルの略。",
@@ -243,6 +253,7 @@
       "audioFrames": 881,
       "leadInFrames": 12,
       "durationInFrames": 919,
+      "beats": {},
       "captions": [
         {
           "t": "ナッシュ均衡をポーカー向けに",
@@ -319,6 +330,9 @@
       "audioFrames": 928,
       "leadInFrames": 12,
       "durationInFrames": 966,
+      "beats": {
+        "kinko": 894
+      },
       "captions": [
         {
           "t": "搾取されないとはどういうことか。",
@@ -385,6 +399,11 @@
       "audioFrames": 1022,
       "leadInFrames": 12,
       "durationInFrames": 1060,
+      "beats": {
+        "youbias": 109,
+        "oppraise": 298,
+        "exploited": 395
+      },
       "captions": [
         {
           "t": "ではあなたがグーが好きだからと",
@@ -461,6 +480,13 @@
       "audioFrames": 1528,
       "leadInFrames": 12,
       "durationInFrames": 1566,
+      "beats": {
+        "board": 239,
+        "hero": 296,
+        "toppair": 439,
+        "danger": 630,
+        "pot": 1299
+      },
       "captions": [
         {
           "t": "ではポーカーではこの均衡が",
@@ -577,6 +603,13 @@
       "audioFrames": 1642,
       "leadInFrames": 12,
       "durationInFrames": 1680,
+      "beats": {
+        "s1": 182,
+        "s2": 240,
+        "s3": 402,
+        "eq": 650,
+        "pct": 1238
+      },
       "captions": [
         {
           "t": "まずポットオッズという計算で",
@@ -688,6 +721,12 @@
       "audioFrames": 1869,
       "leadInFrames": 12,
       "durationInFrames": 1907,
+      "beats": {
+        "win": 240,
+        "lose": 291,
+        "bridge": 546,
+        "pct": 1528
+      },
       "captions": [
         {
           "t": "結論から言うとコールすべきかどうかは",
@@ -819,6 +858,12 @@
       "audioFrames": 2396,
       "leadInFrames": 12,
       "durationInFrames": 2434,
+      "beats": {
+        "mix": 467,
+        "result": 733,
+        "balance": 826,
+        "indifferent": 1792
+      },
       "captions": [
         {
           "t": "では上手い相手はどう打ってくるのでしょうか。",
@@ -970,6 +1015,11 @@
       "audioFrames": 1116,
       "leadInFrames": 12,
       "durationInFrames": 1154,
+      "beats": {
+        "same": 431,
+        "opts": 731,
+        "decide": 924
+      },
       "captions": [
         {
           "t": "では結局のところこのトップペアは",
@@ -1056,6 +1106,9 @@
       "audioFrames": 1289,
       "leadInFrames": 12,
       "durationInFrames": 1327,
+      "beats": {
+        "fan": 332
+      },
       "captions": [
         {
           "t": "ここでGTOを理解するうえで",
@@ -1142,6 +1195,10 @@
       "audioFrames": 1029,
       "leadInFrames": 12,
       "durationInFrames": 1067,
+      "beats": {
+        "gto": 442,
+        "expl": 954
+      },
       "captions": [
         {
           "t": "ここでよくある誤解を",
@@ -1223,6 +1280,10 @@
       "audioFrames": 1077,
       "leadInFrames": 12,
       "durationInFrames": 1115,
+      "beats": {
+        "base": 838,
+        "drop": 912
+      },
       "captions": [
         {
           "t": "たとえばやたらブラフが多い相手には",
@@ -1304,6 +1365,12 @@
       "audioFrames": 1197,
       "leadInFrames": 12,
       "durationInFrames": 1235,
+      "beats": {
+        "y2015": 333,
+        "y2017": 637,
+        "y2019": 710,
+        "lang": 1144
+      },
       "captions": [
         {
           "t": "最後になぜ今GTOなのか。",
@@ -1385,6 +1452,11 @@
       "audioFrames": 834,
       "leadInFrames": 12,
       "durationInFrames": 872,
+      "beats": {
+        "i1": 51,
+        "i2": 256,
+        "i3": 497
+      },
       "captions": [
         {
           "t": "今日のまとめです。",
@@ -1456,6 +1528,7 @@
       "audioFrames": 494,
       "leadInFrames": 12,
       "durationInFrames": 532,
+      "beats": {},
       "captions": [
         {
           "t": "ここまでご覧いただき",

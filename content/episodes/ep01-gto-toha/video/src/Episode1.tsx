@@ -65,7 +65,7 @@ export const Episode1: React.FC = () => {
           const Scene = SCENES[s.id];
           return (
             <Series.Sequence key={s.id} durationInFrames={s.durationInFrames}>
-              <SceneBox duration={s.durationInFrames}>{Scene ? <Scene dur={s.durationInFrames} /> : null}</SceneBox>
+              <SceneBox duration={s.durationInFrames}>{Scene ? <Scene dur={s.durationInFrames} beats={(s as { beats?: Record<string, number> }).beats} /> : null}</SceneBox>
               <Subtitles captions={(s as { captions?: { t: string; from: number; to: number }[] }).captions} />
               <Sequence from={s.leadInFrames}>
                 <Audio src={staticFile("narration/" + s.file)} />
