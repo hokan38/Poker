@@ -191,6 +191,15 @@ def encode(x, path):
 
 
 def main():
+    # 本番用：選んだ style の1ループを指定パスへ（例: public/bgm/bgm.mp3）
+    if len(sys.argv) > 1 and sys.argv[1] == "--final":
+        style = sys.argv[2]
+        out = Path(sys.argv[3]) if len(sys.argv) > 3 else Path("public/bgm/bgm.mp3")
+        out.parent.mkdir(parents=True, exist_ok=True)
+        encode(build(style), out)
+        print(f"final [{style}] -> {out}")
+        return 0
+    # 既定：3種の試聴（2ループ）を書き出す
     outdir = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(".")
     outdir.mkdir(parents=True, exist_ok=True)
     for style in ("noir", "jazz", "cinematic"):
@@ -199,6 +208,7 @@ def main():
         path = outdir / f"bgm-{style}.mp3"
         encode(prev, path)
         print(f"{style:10s} loop {len(loop)/SR:.1f}s -> {path}")
+    return 0
 
 
 if __name__ == "__main__":
