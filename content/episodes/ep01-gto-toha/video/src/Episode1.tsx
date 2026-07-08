@@ -8,6 +8,7 @@ import { SCENES } from "./scenes";
 import manifest from "./manifest.json";
 
 const EASE = Easing.bezier(0.22, 1, 0.36, 1);
+const BGM_VOL = 0.13; // ナレーションの下に控えめに敷く
 
 // 生きた背景の上でコンテンツをクロスフェード（黒幕なし＝背景が透けて滑らかに繋がる）。
 const SceneBox: React.FC<{ duration: number; children: React.ReactNode }> = ({ duration, children }) => {
@@ -46,6 +47,19 @@ export const Episode1: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: bg, fontFamily: FONT }}>
       <Backdrop />
+      {/* BGM：全編ループ＋フェードイン/アウト。ナレーションの下に控えめに */}
+      <Audio
+        src={staticFile("bgm/bgm.mp3")}
+        loop
+        volume={(f) =>
+          interpolate(
+            f,
+            [0, 45, manifest.totalFrames - 75, manifest.totalFrames],
+            [0, BGM_VOL, BGM_VOL, 0],
+            { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+          )
+        }
+      />
       <Series>
         {manifest.scenes.map((s) => {
           const Scene = SCENES[s.id];
