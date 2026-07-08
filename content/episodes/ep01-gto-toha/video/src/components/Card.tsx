@@ -18,15 +18,26 @@ const PATHS: Record<"s" | "h" | "d", string> = {
   d: "M50 10 C58 32 70 44 88 50 C70 56 58 68 50 90 C42 68 30 56 12 50 C30 44 42 32 50 10 Z",
 };
 
+// 4色デッキ：♠墨・♥赤・♦水色・♣緑。各スートに濃淡グラデ（金属質の陰影用）。
+const SUIT_GRAD: Record<Suit, [string, string]> = {
+  s: ["#2c2820", "#0e0b06"],
+  h: ["#cf3a45", "#8f171f"],
+  d: ["#33a6d8", "#136d99"],
+  c: ["#34a866", "#166437"],
+};
+export const suitColor = (suit: Suit): string =>
+  ({ s: C.cardInk, h: C.cardRed, d: C.cardBlue, c: C.cardGreen }[suit]);
+
 /** SVGで描くスート（金属質のグラデ・陰影つき）。 */
 export const Suit: React.FC<{ suit: Suit; size: number; id?: string }> = ({ suit, size, id = "s" }) => {
   const gid = `g-${suit}-${id}-${size}`;
+  const [c0, c1] = SUIT_GRAD[suit];
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" style={{ display: "block", filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.18))" }}>
       <defs>
         <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#2c2820" />
-          <stop offset="1" stopColor="#0e0b06" />
+          <stop offset="0" stopColor={c0} />
+          <stop offset="1" stopColor={c1} />
         </linearGradient>
       </defs>
       {suit === "c" ? (
@@ -80,7 +91,7 @@ export const Card: React.FC<{
       left: flip ? undefined : w * 0.085, right: flip ? w * 0.085 : undefined,
       textAlign: "center", lineHeight: 0.98, transform: flip ? "rotate(180deg)" : undefined,
     }}>
-      <div style={{ fontFamily: LATIN, fontSize: w * 0.26, fontWeight: 600, color: C.cardInk, letterSpacing: "-0.02em" }}>{rankLabel(cc.rank)}</div>
+      <div style={{ fontFamily: LATIN, fontSize: w * 0.26, fontWeight: 600, color: suitColor(cc.suit), letterSpacing: "-0.02em" }}>{rankLabel(cc.rank)}</div>
       <div style={{ marginTop: w * 0.015, display: "flex", justifyContent: "center" }}><Suit suit={cc.suit} size={w * 0.15} id="c" /></div>
     </div>
   );

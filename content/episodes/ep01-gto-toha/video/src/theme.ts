@@ -14,7 +14,10 @@ export const C = {
   silver: "#a9afb3",    // プラチナ／シルバー（対比色）
   silverSoft: "#d0d5d7",
   cardBg: "#f2eee4",    // アイボリーのカード
-  cardInk: "#191510",   // 墨（全スート共通＝モノクロデッキ）
+  cardInk: "#191510",   // ♠ 墨
+  cardRed: "#b3222e",   // ♥ 赤（深みのあるクリムゾン）
+  cardBlue: "#1c86bd",  // ♦ 水色（読みやすい深めのスカイブルー）
+  cardGreen: "#237a49", // ♣ 緑（エメラルド）
   panel: "rgba(255,255,255,0.035)",
 };
 

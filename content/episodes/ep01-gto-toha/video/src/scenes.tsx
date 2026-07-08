@@ -346,9 +346,14 @@ export const S10Ratio: React.FC<SP> = ({ dur }) => {
         {outcome(F(0.14), ["6c", "5h"], "相手がブラフなら", "あなたの勝ち", C.gold, true)}
         {outcome(F(0.3), ["Qd", "Jd"], "相手がストレート・フラッシュなら", "あなたの負け", C.silver, false)}
       </div>
-      {/* 勝てる割合＝相手のブラフの割合、という橋渡し */}
-      <div style={{ textAlign: "center", fontSize: 42, fontWeight: 600, opacity: bridge, transform: `translateY(${(1 - bridge) * 12}px)` }}>
-        あなたが勝てる割合 <span style={{ color: C.muted, fontFamily: LATIN }}>＝</span> 相手が<span style={{ color: C.gold }}>ブラフ</span>の割合
+      {/* 勝てる割合＝相手のブラフの割合、という橋渡し（＋EQの紹介） */}
+      <div style={{ textAlign: "center", opacity: bridge, transform: `translateY(${(1 - bridge) * 12}px)` }}>
+        <div style={{ fontSize: 42, fontWeight: 600 }}>
+          あなたが勝てる割合 <span style={{ color: C.muted, fontFamily: LATIN }}>＝</span> 相手が<span style={{ color: C.gold }}>ブラフ</span>の割合
+        </div>
+        <div style={{ fontSize: 26, color: C.muted, marginTop: 10 }}>
+          ＝ 専門用語で <span style={{ color: C.inkSoft, fontFamily: LATIN, fontWeight: 600 }}>エクイティ（EQ）</span><span style={{ fontSize: 22 }}> ※詳しい計算は割愛</span>
+        </div>
       </div>
       {/* ブラフ頻度メーター：33%を境にコール／降りる */}
       <div style={{ opacity: gauge, transform: `translateY(${(1 - gauge) * 16}px)`, maxWidth: 1200, margin: "6px auto 0", width: "100%" }}>
@@ -410,8 +415,42 @@ export const S11Indiff: React.FC<SP> = ({ dur }) => {
         {pan("コール", -1)}
         {pan("降りる", 1)}
       </div>
-      <div style={{ position: "absolute", bottom: 150, left: 0, right: 0, textAlign: "center" }}><Stamp delay={F(0.72)} fontSize={64}>無差別 ・ EV は同じ</Stamp></div>
+      <div style={{ position: "absolute", bottom: 190, left: 0, right: 0, textAlign: "center" }}><Stamp delay={F(0.72)} fontSize={60}>無差別 ・ EV（期待値）は同じ</Stamp></div>
     </AbsoluteFill>
+  );
+};
+
+/* ============ 11b 結論：コールか降りか（明示） ============ */
+export const SVerdict: React.FC<SP> = ({ dur }) => {
+  const frame = useCurrentFrame();
+  const F = (x: number) => Math.round(x * dur);
+  const a = spring({ frame: frame - F(0.12), fps: 30, config: { damping: 16 } });
+  const b = spring({ frame: frame - F(0.42), fps: 30, config: { damping: 16 } });
+  const opt = (delay: number, title: string, sub: string, arrow: string, col: string) => {
+    const s = spring({ frame: frame - delay, fps: 30, config: { damping: 16 } });
+    return (
+      <div style={{ flex: 1, textAlign: "center", border: `1px solid ${col}66`, borderRadius: 16, padding: "26px 24px", background: "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.012))", opacity: interpolate(s, [0, 1], [0, 1]), transform: `translateY(${interpolate(s, [0, 1], [24, 0])}px)` }}>
+        <div style={{ fontSize: 38, color: col, fontWeight: 700 }}>{title}</div>
+        <div style={{ fontSize: 28, color: C.muted, margin: "6px 0 14px" }}>{sub}</div>
+        <div style={{ fontSize: 56, fontWeight: 700, color: C.ink }}><span style={{ color: C.muted, fontFamily: LATIN }}>→</span> {arrow}</div>
+      </div>
+    );
+  };
+  return (
+    <Stage gap={38}>
+      <Kicker delay={2}>結論 ・ コールか、降りか</Kicker>
+      {/* 理論どおりの相手なら無差別＝どちらも正解 */}
+      <div style={{ textAlign: "center", background: "linear-gradient(180deg, rgba(200,169,107,0.16), rgba(200,169,107,0.04))", border: `1px solid ${C.gold}`, borderRadius: 20, padding: "30px 40px", maxWidth: 1400, margin: "0 auto", width: "100%", opacity: interpolate(a, [0, 1], [0, 1]), transform: `translateY(${interpolate(a, [0, 1], [26, 0])}px)` }}>
+        <div style={{ fontSize: 34, color: C.inkSoft, marginBottom: 10 }}>相手が理論どおり（<span style={{ color: C.gold, fontWeight: 700 }}>2 : 1</span>）に打つなら</div>
+        <div style={{ fontSize: 64, fontWeight: 700 }}>コールも 降りも <span style={{ color: C.gold }}>正解</span> <span style={{ color: C.muted, fontSize: 38 }}>（無差別）</span></div>
+      </div>
+      {/* 実戦では相手のブラフ量で決まる */}
+      <div style={{ display: "flex", gap: 44, justifyContent: "center", maxWidth: 1400, margin: "0 auto", width: "100%", opacity: interpolate(b, [0, 1], [0, 1]) }}>
+        {opt(F(0.44), "ブラフが多い相手", "2:1 より多い", "コール", C.gold)}
+        {opt(F(0.56), "ブラフが少ない相手", "2:1 より少ない", "降りる", C.silver)}
+      </div>
+      <div style={{ textAlign: "center" }}><Stamp delay={F(0.74)} fontSize={50}>決め手は、相手のブラフの量</Stamp></div>
+    </Stage>
   );
 };
 
@@ -565,6 +604,6 @@ export const S17Next: React.FC<SP> = ({ dur }) => {
 export const SCENES: Record<string, React.FC<SP>> = {
   title: S01Title, hook: S02Hook, series: S03Series, def: S04Def, unexploitable: S05Shield,
   janken: S06Janken, jankenExploit: S07Bias, river: S08River, potodds: S09PotOdds, ratio: S10Ratio,
-  indiff: S11Indiff, ranges: S12Ranges, exploit: S13Exploit, foundation: S14Foundation, solved: S15Solved,
+  indiff: S11Indiff, verdict: SVerdict, ranges: S12Ranges, exploit: S13Exploit, foundation: S14Foundation, solved: S15Solved,
   summary: S16Summary, next: S17Next,
 };
