@@ -344,7 +344,7 @@ export const S10Ratio: React.FC<SP> = ({ dur }) => {
       </div>
       <div style={{ display: "flex", gap: 60, alignItems: "stretch", justifyContent: "center", maxWidth: 1300, margin: "0 auto", width: "100%" }}>
         {outcome(F(0.14), ["6c", "5h"], "相手がブラフなら", "あなたの勝ち", C.gold, true)}
-        {outcome(F(0.3), ["Qd", "Jd"], "相手がストレート・フラッシュなら", "あなたの負け", C.silver, false)}
+        {outcome(F(0.3), ["Qd", "Jd"], "相手がストレートやフラッシュなら", "あなたの負け", C.silver, false)}
       </div>
       {/* 勝てる割合＝相手のブラフの割合、という橋渡し（＋EQの紹介） */}
       <div style={{ textAlign: "center", opacity: bridge, transform: `translateY(${(1 - bridge) * 12}px)` }}>
@@ -352,7 +352,7 @@ export const S10Ratio: React.FC<SP> = ({ dur }) => {
           あなたが勝てる割合 <span style={{ color: C.muted, fontFamily: LATIN }}>＝</span> 相手が<span style={{ color: C.gold }}>ブラフ</span>の割合
         </div>
         <div style={{ fontSize: 26, color: C.muted, marginTop: 10 }}>
-          ＝ 専門用語で <span style={{ color: C.inkSoft, fontFamily: LATIN, fontWeight: 600 }}>エクイティ（EQ）</span><span style={{ fontSize: 22 }}> ※詳しい計算は割愛</span>
+          ＝ 専門用語で <span style={{ color: C.inkSoft, fontFamily: LATIN, fontWeight: 600 }}>エクイティ（EQ）</span><span style={{ fontSize: 22 }}> ※EQ自体の説明は割愛</span>
         </div>
       </div>
       {/* ブラフ頻度メーター：33%を境にコール／降りる */}
