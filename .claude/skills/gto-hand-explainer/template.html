@@ -1,0 +1,270 @@
+<title>GTO解説 — {HERO} vs {VILLAIN}</title>
+<style>
+  :root{
+    --bg:#12151a; --grad:#171d19;
+    --surface:#1b2128; --surface2:#232b33; --raise:#2b343d;
+    --line:rgba(255,255,255,.09); --line-strong:rgba(255,255,255,.16);
+    --ink:#e9ece7; --ink-mid:#b4bcb6; --ink-dim:#8b948d;
+    --gold:#e4b451; --gold-soft:rgba(228,180,81,.14);
+    --bet:#e35b4d; --check:#48bf73; --fold:#4a6fb0; --call:#48bf73;
+    --win:#e4b451;
+    --card-face:#f6f4ee; --spade:#2a2f36; --heart:#d5372c; --diamond:#2f6fd0; --club:#2e9e52;
+    --shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 8px 22px -12px rgba(0,0,0,.7);
+    --sans:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic","Meiryo",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:light){
+    :root{
+      --bg:#efece4; --grad:#e9e7dd;
+      --surface:#ffffff; --surface2:#f6f3ec; --raise:#efece2;
+      --line:rgba(20,22,18,.11); --line-strong:rgba(20,22,18,.2);
+      --ink:#1c221f; --ink-mid:#4c534d; --ink-dim:#6d746d;
+      --gold:#a5761c; --gold-soft:rgba(165,118,28,.12);
+      --bet:#cd4636; --check:#2c9a55; --fold:#43679f; --call:#2c9a55;
+      --win:#a5761c;
+      --shadow:0 1px 0 rgba(255,255,255,.7) inset, 0 10px 24px -14px rgba(40,35,20,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12151a; --grad:#171d19; --surface:#1b2128; --surface2:#232b33; --raise:#2b343d;
+    --line:rgba(255,255,255,.09); --line-strong:rgba(255,255,255,.16);
+    --ink:#e9ece7; --ink-mid:#b4bcb6; --ink-dim:#8b948d;
+    --gold:#e4b451; --gold-soft:rgba(228,180,81,.14);
+    --bet:#e35b4d; --check:#48bf73; --fold:#4a6fb0; --call:#48bf73; --win:#e4b451;
+    --shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 8px 22px -12px rgba(0,0,0,.7);
+  }
+  :root[data-theme="light"]{
+    --bg:#efece4; --grad:#e9e7dd; --surface:#ffffff; --surface2:#f6f3ec; --raise:#efece2;
+    --line:rgba(20,22,18,.11); --line-strong:rgba(20,22,18,.2);
+    --ink:#1c221f; --ink-mid:#4c534d; --ink-dim:#6d746d;
+    --gold:#a5761c; --gold-soft:rgba(165,118,28,.12);
+    --bet:#cd4636; --check:#2c9a55; --fold:#43679f; --call:#2c9a55; --win:#a5761c;
+    --shadow:0 1px 0 rgba(255,255,255,.7) inset, 0 10px 24px -14px rgba(40,35,20,.4);
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0}
+  .page{
+    background:
+      radial-gradient(1200px 500px at 50% -8%, var(--grad), transparent 60%),
+      var(--bg);
+    color:var(--ink); font-family:var(--sans); line-height:1.72;
+    font-size:16.5px; letter-spacing:.01em; min-height:100vh;
+    padding:clamp(18px,4vw,40px) clamp(14px,4vw,24px) 80px;
+  }
+  .wrap{max-width:880px;margin:0 auto}
+  .mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+  .hero{text-align:center;padding:8px 0 26px}
+  .eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.32em;text-transform:uppercase;color:var(--gold);font-weight:600;margin:0 0 14px}
+  h1{font-size:clamp(1.7rem,5.2vw,2.7rem);line-height:1.15;margin:0 0 14px;font-weight:800;letter-spacing:-.015em;text-wrap:balance}
+  h1 .sub{color:var(--ink-dim);font-weight:600}
+  .meta{display:inline-flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:6px}
+  .chip{font-family:var(--mono);font-size:.76rem;letter-spacing:.02em;padding:5px 11px;border:1px solid var(--line-strong);border-radius:999px;color:var(--ink-mid);background:var(--surface)}
+
+  .board{display:flex;gap:clamp(5px,1.4vw,10px);align-items:flex-end;justify-content:center;flex-wrap:wrap;margin:22px 0 6px}
+  .card{--c:var(--spade);position:relative;width:clamp(40px,10vw,58px);aspect-ratio:5/7;border-radius:8px;background:var(--card-face);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.15);font-family:var(--mono);font-weight:800;font-size:clamp(1.35rem,4.4vw,1.9rem);color:var(--c);line-height:1}
+  .card::after{content:attr(data-s);position:absolute;bottom:4px;right:6px;font-size:.7rem;color:var(--c);opacity:.9}
+  .card::before{content:attr(data-s);position:absolute;top:4px;left:6px;font-size:.7rem;color:var(--c);opacity:.9}
+  .card.s{--c:var(--spade)} .card.h{--c:var(--heart)} .card.d{--c:var(--diamond)} .card.c{--c:var(--club)}
+  .card.sm{width:clamp(30px,7vw,40px);font-size:clamp(1rem,3.4vw,1.3rem);border-radius:6px}
+  .card.sm::before,.card.sm::after{font-size:.55rem}
+  .street-sep{width:1px;align-self:stretch;background:var(--line-strong);margin:0 2px}
+  .board-lbls{display:flex;gap:clamp(5px,1.4vw,10px);justify-content:center;flex-wrap:wrap;font-family:var(--mono);font-size:.66rem;letter-spacing:.14em;color:var(--ink-dim);text-transform:uppercase;margin-top:8px}
+  .board-lbls span{width:clamp(40px,10vw,58px);text-align:center}
+  .board-lbls .sep{width:1px;margin:0 2px;flex:0 0 auto}
+
+  section{margin-top:clamp(28px,6vw,48px)}
+  .street{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(18px,4vw,28px);box-shadow:0 20px 40px -30px rgba(0,0,0,.6)}
+  .street-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:4px}
+  .street-no{font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;color:var(--gold);border:1px solid var(--gold);border-radius:6px;padding:3px 8px;font-weight:600;white-space:nowrap}
+  .street-head h2{font-size:clamp(1.25rem,3.6vw,1.6rem);margin:0;font-weight:800;letter-spacing:-.01em}
+  .street-head .potline{font-family:var(--mono);font-size:.82rem;color:var(--ink-dim);margin-left:auto;white-space:nowrap}
+  .minirow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0 4px}
+  .did{font-size:.96rem;color:var(--ink-mid);background:var(--surface2);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:10px 14px;margin:14px 0}
+  .did b{color:var(--ink)}
+
+  h3{font-size:.82rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim);margin:24px 0 12px;font-family:var(--mono);display:flex;align-items:center;gap:9px}
+  h3::before{content:"";width:6px;height:6px;border-radius:2px;background:var(--gold);transform:rotate(45deg)}
+  p{margin:0 0 12px}
+  .lead{color:var(--ink-mid)}
+
+  .reasons{display:flex;flex-direction:column;gap:12px;margin:6px 0 4px;padding:0;list-style:none}
+  .reasons li{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:13px 15px}
+  .reasons .k{font-family:var(--mono);font-size:.7rem;font-weight:700;color:var(--gold);background:var(--gold-soft);border-radius:6px;padding:3px 7px;white-space:nowrap;margin-top:2px}
+  .reasons .t{font-size:.95rem}
+  .reasons .t b{color:var(--ink)}
+  .reasons .t .hl{color:var(--gold);font-weight:700}
+
+  .bar{display:flex;height:34px;border-radius:8px;overflow:hidden;border:1px solid var(--line-strong)}
+  .seg{display:flex;align-items:center;justify-content:center;gap:7px;min-width:0;font-family:var(--mono);font-size:.82rem;font-weight:700;color:#0d0f0d;white-space:nowrap;padding:0 6px;overflow:hidden}
+  .seg small{font-weight:600;font-size:.72rem;opacity:.8}
+  .seg.bet{background:var(--bet)} .seg.check{background:var(--check)} .seg.fold{background:var(--fold);color:#f4f7ff} .seg.call{background:var(--call)}
+  .note{font-size:.82rem;color:var(--ink-dim);margin-top:10px;line-height:1.6}
+
+  .seat{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--surface2);margin:14px 0}
+  .seat.bb{border-left:4px solid var(--gold)}
+  .seat.utg{border-left:4px solid var(--ink-dim)}
+  .seat-head{display:flex;align-items:center;gap:10px;margin-bottom:11px;flex-wrap:wrap}
+  .seat-tag{font-family:var(--mono);font-weight:800;font-size:.72rem;letter-spacing:.05em;padding:3px 9px;border-radius:6px;white-space:nowrap}
+  .seat-tag.bb{color:#0d0f0d;background:var(--gold)}
+  .seat-tag.utg{color:var(--ink-mid);background:var(--raise);border:1px solid var(--line-strong)}
+  .seat-head .role{font-size:.86rem;color:var(--ink-mid)}
+  .seat-head .role b{color:var(--ink)}
+  .seat .bar{height:30px}
+  .seat .note{margin-top:9px}
+  .seat .hh{color:var(--gold);font-weight:700}
+  .seat .hv{color:var(--bet);font-weight:700}
+  .purestat{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:.84rem;color:var(--ink-mid);background:var(--surface);border:1px dashed var(--line-strong);border-radius:7px;padding:8px 12px}
+  .purestat b{color:var(--check);font-weight:800}
+
+  .callout{background:linear-gradient(180deg,var(--gold-soft),transparent);border:1px solid var(--gold);border-radius:12px;padding:16px 18px;margin:18px 0}
+  .callout .lbl{font-family:var(--mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:6px}
+  .callout p{margin:0;color:var(--ink);font-size:.98rem}
+  .callout b{color:var(--gold)}
+
+  /* turn analytics stat cards */
+  .math{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0 4px}
+  .math .cell{background:var(--surface2);border:1px solid var(--line);border-radius:11px;padding:14px 15px;text-align:center}
+  .math .cell .n{font-family:var(--mono);font-weight:800;font-size:1.5rem;line-height:1;margin-bottom:6px;font-variant-numeric:tabular-nums}
+  .math .cell .n.grn{color:var(--check)}
+  .math .cell .n.red{color:var(--bet)}
+  .math .cell .cl{font-size:.74rem;color:var(--ink-dim);line-height:1.5}
+
+  /* combo breakdown */
+  .combos{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0 4px}
+  .combo{border:1px solid var(--line);border-left:4px solid var(--ink-dim);border-radius:10px;padding:11px 12px;background:var(--surface2)}
+  .combo.b{border-left-color:var(--bet)}
+  .combo.hero{outline:2px solid var(--gold);outline-offset:1px;background:var(--gold-soft)}
+  .combo .cr{display:flex;align-items:center;gap:5px}
+  .combo .pct{margin-left:auto;font-family:var(--mono);font-weight:800;font-size:1rem;color:var(--ink-dim)}
+  .combo.b .pct{color:var(--bet)}
+  .combo .lab{font-family:var(--mono);font-size:.66rem;color:var(--ink-dim);margin-top:8px;letter-spacing:.03em}
+  .combo.hero .lab{color:var(--gold)}
+  .grouphd{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:var(--ink-mid);margin:14px 0 6px;text-transform:uppercase}
+
+  /* real range-chart figures (embedded GTO Wizard grids) */
+  .rangefig{margin:14px 0 2px}
+  .rangehd{font-family:var(--mono);font-size:.68rem;letter-spacing:.02em;color:var(--ink-dim);margin-bottom:8px;line-height:1.6}
+  .imgwrap{overflow-x:auto;border-radius:8px;border:1px solid var(--line-strong);background:#101317}
+  .rangeimg{display:block;width:100%;min-width:480px;height:auto}
+  .rangefig figcaption{font-size:.82rem;color:var(--ink-dim);margin-top:9px;line-height:1.65}
+  .rangefig figcaption b{color:var(--ink)}
+  .sw{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin:0 3px 0 6px}
+  .sw.b{background:#c0392b} .sw.g{background:#3a9b5c} .sw.f{background:#3f5f8f} .sw.d{background:#20242a;border:1px solid var(--line-strong)}
+  .h88{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:11px 0 2px;background:var(--gold-soft);border:1px solid var(--gold);border-radius:9px;padding:8px 12px}
+  .h88 .lb{font-family:var(--mono);font-size:.72rem;font-weight:800;color:var(--gold);white-space:nowrap}
+  .h88 .minibar{display:flex;height:16px;flex:1;min-width:120px;border-radius:4px;overflow:hidden;border:1px solid var(--line-strong)}
+  .h88 .minibar .seg{padding:0;min-width:0}
+  .h88 .tx{font-family:var(--mono);font-size:.8rem;color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+
+  .takeaways{counter-reset:t;display:flex;flex-direction:column;gap:14px;margin-top:14px}
+  .takeaways li{list-style:none;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:16px 18px}
+  .takeaways li::before{counter-increment:t;content:counter(t);font-family:var(--mono);font-weight:800;font-size:1.15rem;color:var(--gold);background:var(--gold-soft);border-radius:9px;width:38px;height:38px;display:flex;align-items:center;justify-content:center}
+  .takeaways .h{font-weight:800;margin-bottom:2px}
+  .takeaways .b{font-size:.92rem;color:var(--ink-mid)}
+
+  .foot{margin-top:38px;text-align:center;font-size:.8rem;color:var(--ink-dim);line-height:1.7}
+  .foot .hand{font-family:var(--mono)}
+  .inline-c{display:inline-flex;gap:3px;vertical-align:middle;transform:translateY(2px)}
+
+  @media(max-width:560px){
+    .seg{padding:0 4px}
+    .seg small{display:none}
+  }
+</style>
+
+<!--
+  =====================================================================
+  TEMPLATE USAGE (see SKILL.md for the full method)
+  - Self-contained: inline CSS above (do NOT add <html>/<head>/<body>).
+  - Works in light & dark theme; images must be base64 data URIs (CSP).
+  - Replace {PLACEHOLDERS}. Keep the hero (gold .seat.bb) as the spine,
+    opponent (grey .seat.utg) as context. Every .bar's segments sum to 100.
+  - 4-color deck: card s=spade(dark) h=heart(red) d=diamond(blue) c=club(green).
+  =====================================================================
+-->
+<div class="page"><div class="wrap">
+
+  <!-- ============ HERO HEADER ============ -->
+  <header class="hero">
+    <p class="eyebrow">GTO Wizard ハンド解説 · Street-by-Street</p>
+    <h1>{HERO_POS} <span class="mono">{HERO_CARDS}</span> の一手<br><span class="sub mono">vs {VILLAIN} · {POT_TYPE}</span></h1>
+    <div class="meta">
+      <span class="chip">{FORMAT}</span><span class="chip">{STACK}</span>
+      <span class="chip">Hero = {HERO_POS}</span><span class="chip">相手 = {VILLAIN}</span>
+    </div>
+    <div class="board">
+      <!-- board runout as 4-color cards; use .street-sep between streets -->
+      <div class="card s" data-s="♠">T</div><div class="card h" data-s="♥">5</div><div class="card d" data-s="♦">2</div>
+      <div class="street-sep"></div><div class="card c" data-s="♣">9</div>
+      <div class="street-sep"></div><div class="card c" data-s="♣">5</div>
+    </div>
+    <div class="board-lbls"><span>フロップ</span><span></span><span></span><span class="sep"></span><span>ターン</span><span class="sep"></span><span>リバー</span></div>
+    <p class="lead" style="margin-top:18px;max-width:60ch;margin-left:auto;margin-right:auto">{ONE_LINE_THESIS}</p>
+  </header>
+
+  <!-- ============ 前提 / PREMISES ============ -->
+  <section><div class="street">
+    <div class="street-head"><span class="street-no">前提</span><h2>読む前の物差し</h2></div>
+    <ul class="reasons">
+      <li><span class="k">位置</span><span class="t">{IP/OOP note}</span></li>
+      <li><span class="k">レンジ</span><span class="t">各ブロックで<b>レンジ全体の%</b>と<b>私の{HAND}の答え</b>を分けて示す。</span></li>
+    </ul>
+  </div></section>
+
+  <!-- ============ ONE STREET (repeat per street) ============ -->
+  <section><div class="street">
+    <div class="street-head"><span class="street-no">STREET 0X · TURN</span><h2>{BOARD}</h2><span class="potline">ポット {POT}bb</span></div>
+    <div class="minirow"><div class="board"><!-- mini board: .card.sm --></div></div>
+    <div class="did"><b>私({HERO})の局面：</b> {what happened, opponent action as context}</div>
+
+    <!-- opponent context block (grey) -->
+    <div class="seat utg">
+      <div class="seat-head"><span class="seat-tag utg">相手 {VILLAIN}</span><span class="role">{role}</span></div>
+      <div class="bar"><div class="seg bet" style="flex:30.8">ベット <small>30.8%</small></div><div class="seg check" style="flex:69.2">チェック <small>69.2%</small></div></div>
+      <div class="note"><span class="hv">{villain hand} → ...</span></div>
+    </div>
+
+    <!-- hero decision block (gold) -->
+    <div class="seat bb">
+      <div class="seat-head"><span class="seat-tag bb">私({HERO})の戦略</span><span class="role">{role}</span></div>
+      <div class="bar"><div class="seg bet" style="flex:31.9">ベット <small>31.9%</small></div><div class="seg check" style="flex:68.1">チェック <small>68.1%</small></div></div>
+      <div class="note"><span class="hh">私の{HAND} → {split}</span></div>
+    </div>
+
+    <h3>なぜ{...}なのか</h3>
+    <ul class="reasons"><li><span class="k">{key}</span><span class="t">{reason}</span></li></ul>
+
+    <!-- OPTIONAL: detail metrics (equity / nut adv / opp fold%) -->
+    <div class="math">
+      <div class="cell"><div class="n grn">59.4%</div><div class="cl">私のエクイティ</div></div>
+      <div class="cell"><div class="n red">57.3%</div><div class="cl">相手のフォールド率</div></div>
+    </div>
+
+    <!-- OPTIONAL: per-combo breakdown when suit-dependent -->
+    <div class="combos">
+      <div class="combo b hero"><div class="cr"><span class="card s sm" data-s="♠" style="width:24px;font-size:.8rem">8</span><span class="card c sm" data-s="♣" style="width:24px;font-size:.8rem">8</span><span class="pct">42%</span></div><div class="lab">8♠8♣（今回）</div></div>
+    </div>
+
+    <!-- OPTIONAL: real range chart (base64) + hero-hand mini-stat -->
+    <figure class="rangefig">
+      <div class="rangehd">実際のレンジ表 ─ 私({HERO})の{STREET}<span class="sw b"></span>ベット<span class="sw g"></span>チェック<span class="sw d"></span>レンジ外</div>
+      <div class="imgwrap"><img class="rangeimg" alt="{HERO}{STREET}のレンジ表" src="RANGEIMG_TURN"></div>
+      <div class="h88"><span class="lb">{HAND}の戦略</span><div class="minibar"><span class="seg bet" style="flex:18.7"></span><span class="seg check" style="flex:81.3"></span></div><span class="tx">Bet 18.7% / Check 81.3%</span></div>
+      <figcaption>{what the red cells are; where the hand sits}</figcaption>
+    </figure>
+  </div></section>
+
+  <!-- ============ TAKEAWAYS ============ -->
+  <section>
+    <div class="street-head" style="padding:0 4px"><span class="street-no">まとめ</span><h2>持ち帰る3つ</h2></div>
+    <ul class="takeaways">
+      <li><div><div class="h">{takeaway}</div><div class="b">{detail}</div></div></li>
+    </ul>
+  </section>
+
+  <div class="foot"><p>GTO Wizardの画面録画をフレーム解析して作成。頻度はソルバー表示値。<br>Hero <span class="hand">{HERO_CARDS}</span> · Board <span class="hand">{BOARD}</span> · 相手 <span class="hand">{VILLAIN}</span></p></div>
+
+</div></div>
