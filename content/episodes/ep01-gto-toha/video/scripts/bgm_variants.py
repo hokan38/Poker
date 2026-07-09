@@ -72,6 +72,15 @@ def piano_tone(f, n):
     return out * np.exp(-t / 0.9) * (1 - np.exp(-t / 0.005))
 
 
+def bell_tone(f, n):
+    # セレスタ/グロッケン風のきらめき（明るい上物）
+    t = np.arange(n) / SR
+    out = (np.sin(2 * np.pi * f * t) + 0.6 * np.sin(2 * np.pi * 2 * f * t)
+           + 0.28 * np.sin(2 * np.pi * 3.01 * f * t) + 0.12 * np.sin(2 * np.pi * 4.7 * f * t))
+    env = np.exp(-t / 1.1) * (1 - np.exp(-t / 0.002))
+    return out * env
+
+
 def reverb(x, wet, tau, cut):
     ir_n = int((tau * 3.2) * SR)
     t = np.arange(ir_n) / SR
@@ -142,6 +151,17 @@ def sprinkle(events, total_n, style):
     return out
 
 
+def sprinkle_tone(events, total_n, tone_fn, tone_len=2.2):
+    """任意の音色でまばらな上物（ベル等）を配置。"""
+    out = np.zeros(total_n)
+    for tf, note, vel in events:
+        start = int(tf * total_n) % total_n
+        tone = tone_fn(freq(note), int(tone_len * SR))
+        end = min(start + len(tone), total_n)
+        out[start:end] += tone[: end - start] * vel
+    return out
+
+
 STYLES = {
     # ダーク・緊張感（ポーカーの張り詰めた空気）
     "noir": dict(
@@ -161,24 +181,26 @@ STYLES = {
         rev=(0.3, 0.7, 4200),
         lead=[(0.30, "A4", 0.16), (0.75, "C5", 0.14), (1.55, "B4", 0.15), (2.40, "E5", 0.13), (3.10, "D5", 0.14)],
     ),
-    # 明るいラウンジ・ジャズ（軽快・メジャー・高め音域）— jazzの陰りを解消
+    # 明るいラウンジ・ジャズ（軽快・メジャー・高め音域＋ベルのきらめき）— jazzの陰りを解消
     "brightjazz": dict(
-        seg=6.0,
+        seg=6.0, seed=7,
         # I - vi - ii - V の明るいターンアラウンド（Cmaj9 - Am9 - Dm9 - G9）を高め音域で
         chords=[["C4", "E4", "G4", "B4", "D5"], ["A3", "C4", "E4", "G4", "B4"],
                 ["D4", "F4", "A4", "C5", "E5"], ["G3", "B3", "D4", "F4", "A4"]],
-        roots=["C3", "A2", "D3", "G2"], timbre="rhodes", bright=1.0, chord_lvl=0.32, bass_lvl=0.32,
-        rev=(0.22, 0.55, 6200), air=0.38,
-        lead=[(0.30, "E5", 0.14), (0.85, "G5", 0.12), (1.60, "C5", 0.13),
-              (2.45, "D5", 0.12), (3.15, "B4", 0.12)],
+        roots=["C3", "A2", "D3", "G2"], timbre="rhodes", bright=1.0, chord_lvl=0.3, bass_lvl=0.3,
+        rev=(0.2, 0.5, 6800), air=0.6,
+        lead=[(0.30, "E5", 0.13), (1.60, "C5", 0.12), (3.15, "B4", 0.12)],
+        bells=[(0.30, "G5", 0.16), (0.85, "E5", 0.13), (1.55, "C6", 0.14),
+               (2.45, "D6", 0.12), (3.10, "B5", 0.13), (4.30, "G5", 0.12), (5.20, "E6", 0.12)],
     ),
-    # 温かいメジャー・ラウンジ（Cadd9 ⇄ Fmaj9 のシンプルで陽だまり的なヴァンプ）
+    # 温かいメジャー・ラウンジ（Cadd9 ⇄ Fmaj9・パッドで丸く開放的。明るいが穏やか）
     "warmlounge": dict(
-        seg=8.0,
+        seg=8.0, seed=23,
         chords=[["C4", "E4", "G4", "A4", "D5"], ["F4", "A4", "C5", "E5", "G5"]],
-        roots=["C3", "F2"], timbre="rhodes", bright=1.0, chord_lvl=0.32, bass_lvl=0.3,
-        rev=(0.20, 0.55, 6500), air=0.42,
-        lead=[(0.40, "G5", 0.13), (1.30, "E5", 0.12), (2.20, "A5", 0.12), (3.05, "C5", 0.12)],
+        roots=["C3", "F2"], timbre="pad", bright=1.0, chord_lvl=0.32, bass_lvl=0.3,
+        rev=(0.26, 0.7, 5200), air=0.32,
+        lead=[(0.40, "G4", 0.14), (1.60, "E4", 0.12), (2.60, "A4", 0.13), (3.30, "C5", 0.12)],
+        bells=[(0.30, "C5", 0.12), (2.60, "G4", 0.11)],
     ),
     # 荘厳・シネマティック（プレミアムなドキュメンタリー感）
     "cinematic": dict(
@@ -193,11 +215,15 @@ STYLES = {
 
 
 def build(style):
+    global rng
     p = STYLES[style]
+    rng = np.random.default_rng(p.get("seed", 11))   # スタイルごとに質感を分ける
     bed = chord_bed(p["chords"], p["seg"], p["timbre"], p["chord_lvl"], p.get("bright", 1.0))
     n = len(bed)
     bass = bass_line(p["roots"], p["seg"], p["bass_lvl"])[:n]
     lead = sprinkle(p["lead"], n, style)
+    if p.get("bells"):   # ベルのきらめき（明るさを前に出す）
+        lead = lead + sprinkle_tone(p["bells"], n, bell_tone)
     mix = bed + bass + lead
     wet, tau, cut = p["rev"]
     mix = reverb(mix, wet, tau, cut)
