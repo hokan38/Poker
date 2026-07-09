@@ -8,7 +8,7 @@ import { SCENES } from "./scenes";
 import manifest from "./manifest.json";
 
 const EASE = Easing.bezier(0.22, 1, 0.36, 1);
-const BGM_VOL = 0.13; // ナレーションの下に控えめに敷く
+const BGM_VOL = 0.3; // ナレーションの下に敷くが、はっきり聞こえる音量
 
 // 生きた背景の上でコンテンツをクロスフェード（黒幕なし＝背景が透けて滑らかに繋がる）。
 const SceneBox: React.FC<{ duration: number; children: React.ReactNode }> = ({ duration, children }) => {
