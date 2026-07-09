@@ -241,7 +241,7 @@
         <div class="seg bet" style="flex:51.7">ベット4.4 <small>51.7%</small></div>
         <div class="seg check" style="flex:48.3">チェック <small>48.3%</small></div>
       </div>
-      <div class="note">ベット4.4bb ≈ <b>ポットの約68%</b>のやや<b>マージン（レンジ）寄り</b>のサイズ。私のレンジは<span class="hh">エクイティ59.4%</span>で相手より上——約半分でベットして主導権を握る。理論上、相手は<b>MDF ≈ 60%</b>（＝6.5/10.9）を続行しなければならない。</div>
+      <div class="note">ベット4.4bb ≈ <b>ポットの約68%</b>のやや<b>マージン（レンジ）寄り</b>のサイズ。約半分をベットできる＝<b>レンジ優位</b>のスポットで主導権を握る。理論上、相手は <b>MDF ≈ 60%</b>（＝6.5/10.9）を続行しなければならない。</div>
     </div>
 
     <h3>88はスートで割れる（ブロッカー × プロテクション）</h3>
@@ -253,7 +253,7 @@
 
     <div class="grouphd">88の6コンボ ─ ターンのベット頻度</div>
     <div class="combos">
-      <div class="combo b hero"><div class="cr"><span class="card s sm" data-s="♠" style="width:24px;font-size:.8rem">8</span><span class="card c sm" data-s="♣" style="width:24px;font-size:.8rem">8</span><span class="pct">≈42%</span></div><div class="lab">8♠8♣（今回・8♠持ち）</div></div>
+      <div class="combo b hero"><div class="cr"><span class="card s sm" data-s="♠" style="width:24px;font-size:.8rem">8</span><span class="card c sm" data-s="♣" style="width:24px;font-size:.8rem">8</span><span class="pct">41.9%</span></div><div class="lab">8♠8♣（今回・8♠持ち）</div></div>
       <div class="combo b"><div class="cr"><span class="card s sm" data-s="♠" style="width:24px;font-size:.8rem">8</span><span class="card h sm" data-s="♥" style="width:24px;font-size:.8rem">8</span><span class="pct">49.2%</span></div><div class="lab">8♠8♥</div></div>
       <div class="combo b"><div class="cr"><span class="card s sm" data-s="♠" style="width:24px;font-size:.8rem">8</span><span class="card d sm" data-s="♦" style="width:24px;font-size:.8rem">8</span><span class="pct">41.9%</span></div><div class="lab">8♠8♦</div></div>
       <div class="combo"><div class="cr"><span class="card h sm" data-s="♥" style="width:24px;font-size:.8rem">8</span><span class="card d sm" data-s="♦" style="width:24px;font-size:.8rem">8</span><span class="pct">0.7%</span></div><div class="lab">8♥8♦（スペード無し）</div></div>
@@ -289,12 +289,12 @@
     </div>
 
     <div class="seat bb">
-      <div class="seat-head"><span class="seat-tag bb">私(BTN)の戦略</span><span class="role">レンジ全体 → 私の88</span></div>
+      <div class="seat-head"><span class="seat-tag bb">私(BTN)の戦略</span><span class="role">私の8♠8♣</span></div>
       <div class="bar">
-        <div class="seg bet" style="flex:41">ベット15.3 <small>41%</small></div>
-        <div class="seg check" style="flex:59">チェック <small>59%</small></div>
+        <div class="seg bet" style="flex:0.1">ベット <small>0.1%</small></div>
+        <div class="seg check" style="flex:99.9">チェック <small>99.9%</small></div>
       </div>
-      <div class="note">ベット15.3bb ＝ <b>ポット100%のポラー・サイズ</b>。私の<span class="hh">8♠8♣ → ベット 0.1% / チェック 99.9%（ほぼ純チェック）</span>。</div>
+      <div class="note"><span class="hh">8♠8♣ → ベット 0.1% / チェック 99.9%（ほぼ純チェック）</span>。相手のリバーベットは <b>ポット100%のポラー・サイズ</b>で、中身は<b>ナッツ級バリュー＋ブラフだけ</b>——88はそこに入らない。</div>
     </div>
 
     <!-- polar structure via alpha/MDF -->
@@ -314,15 +314,9 @@
     </ul>
     <div class="purestat" style="border-style:solid;border-color:var(--gold)"><span style="color:var(--gold);font-weight:800">仕分けの結論</span>&nbsp;&nbsp;8♠8♣ = <b>ブラフキャッチャー</b>（バリューでもブラフでもない）→ <b>チェック</b></div>
 
-    <div class="grouphd">この局面のソルバー表示（私=BTN側）</div>
-    <div class="math">
-      <div class="cell"><div class="n">47.3%</div><div class="cl">生エクイティ<br>（相手52.7%＝わずかに負け）</div></div>
-      <div class="cell"><div class="n grn">56.2%</div><div class="cl">EV（獲得期待値）<br>なのに私が上回る</div></div>
-      <div class="cell"><div class="n grn">110%</div><div class="cl">EQR（実現率）<br>IP＋ポラで過剰実現</div></div>
-    </div>
     <div class="callout">
-      <div class="lbl">Key idea</div>
-      <p><b>生EQが5割を切っていてもEVは私が上</b>——IPでポラライズし、相手のブラフキャッチャーを苦しめられるから。「EQがあるからベット」ではなく、<b>打てるハンドだけがベット、88はチェック</b>。これが<b>切り離し・押し上げ</b>の実例。</p>
+      <div class="lbl">Key idea — EQ ≠ EV ≠ EQR</div>
+      <p>リバーの生エクイティが<b>ほぼ互角</b>でも、<b>IP＋ポラライズ</b>なら実現率(EQR)は100%を超え、EVは打ち手側に傾きうる。だから「EQがあるからベット」ではなく、<b>打てるハンド（ナッツ級＋ブラフ）だけがベット、中間の88はチェック</b>。これが<b>切り離し・押し上げ</b>の実例。</p>
     </div>
 
     <figure class="rangefig">
@@ -342,10 +336,10 @@
       <li><div><div class="h">サイズが「どのハンドを打てるか」を決める</div><div class="b">ポット100%（ポラー）はバリュー:ブラフ=2:1で、ナッツ級とブラフだけ。中間の88は<b>席が無い</b>。小さいレンジベットとは別物。</div></div></li>
       <li><div><div class="h">Value か否かは"相手のcallレンジ"で判断</div><div class="b">自分の手の強さではなく、ベットにコールしてくる範囲に勝っているか。88はそれに負けているので打てない（切り離し）。</div></div></li>
       <li><div><div class="h">同じ88でもストリートで逆になる</div><div class="b">ターンは<b>8♠ブロッカー＋プロテクション</b>で打てる。リバーはプロテクションが消え、脆いワンペアはただのブラフキャッチャー→チェック。</div></div></li>
-      <li><div><div class="h">生EQ 5割でもEQRは110%</div><div class="b">IP＋ポラライズで過剰実現できる。EQの数字だけを見て「あるから打つ」としない。結果（TTに負け）と正誤（91%正解）は分けて考える。</div></div></li>
+      <li><div><div class="h">生EQがほぼ互角でもEQRは100%超になりうる</div><div class="b">IP＋ポラライズで過剰実現できる。EQの数字だけを見て「あるから打つ」としない。結果（TTに負け）と正誤（91%正解）は分けて考える。</div></div></li>
     </ul>
   </section>
 
-  <div class="foot"><p>GTO Wizardの画面録画（練習＋学習モード）をフレーム解析して作成。頻度はソルバー表示値、理論の枠組みはAmu(goole)の無料note記事に基づく非公式まとめ。<br>Hero <span class="hand">8♠8♣</span> · Board <span class="hand">J♠ 9♠ 5♥ Q♠ K♣</span> · 相手 <span class="hand">CO（ショウダウンはTT）</span></p></div>
+  <div class="foot"><p>GTO Wizardの画面録画（練習＋学習モード）をフレーム解析して作成。<b>レンジ全体の頻度は無フィルターの戦略画面から、各ハンドの選択はそのハンドのセルから</b>読み取り（一部キャプチャはレンジ絞り込み表示だったため、レンジ全体のEQ/EV/EQRは割愛）。理論の枠組みはAmu(goole)の無料note記事に基づく非公式まとめ。<br>Hero <span class="hand">8♠8♣</span> · Board <span class="hand">J♠ 9♠ 5♥ Q♠ K♣</span> · 相手 <span class="hand">CO（ショウダウンはTT）</span></p></div>
 
 </div></div>
