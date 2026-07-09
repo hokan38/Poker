@@ -32,6 +32,11 @@ def lp(x, cut, order=4):
     return lfilter(b, a, x)
 
 
+def hp(x, cut, order=2):
+    b, a = butter(order, max(40, cut) / (SR / 2), btype="high")
+    return lfilter(b, a, x)
+
+
 def pad_tone(f, n, bright=1.0):
     t = np.arange(n) / SR
     out = np.zeros(n)
@@ -156,6 +161,25 @@ STYLES = {
         rev=(0.3, 0.7, 4200),
         lead=[(0.30, "A4", 0.16), (0.75, "C5", 0.14), (1.55, "B4", 0.15), (2.40, "E5", 0.13), (3.10, "D5", 0.14)],
     ),
+    # 明るいラウンジ・ジャズ（軽快・メジャー・高め音域）— jazzの陰りを解消
+    "brightjazz": dict(
+        seg=6.0,
+        # I - vi - ii - V の明るいターンアラウンド（Cmaj9 - Am9 - Dm9 - G9）を高め音域で
+        chords=[["C4", "E4", "G4", "B4", "D5"], ["A3", "C4", "E4", "G4", "B4"],
+                ["D4", "F4", "A4", "C5", "E5"], ["G3", "B3", "D4", "F4", "A4"]],
+        roots=["C3", "A2", "D3", "G2"], timbre="rhodes", bright=1.0, chord_lvl=0.32, bass_lvl=0.32,
+        rev=(0.22, 0.55, 6200), air=0.38,
+        lead=[(0.30, "E5", 0.14), (0.85, "G5", 0.12), (1.60, "C5", 0.13),
+              (2.45, "D5", 0.12), (3.15, "B4", 0.12)],
+    ),
+    # 温かいメジャー・ラウンジ（Cadd9 ⇄ Fmaj9 のシンプルで陽だまり的なヴァンプ）
+    "warmlounge": dict(
+        seg=8.0,
+        chords=[["C4", "E4", "G4", "A4", "D5"], ["F4", "A4", "C5", "E5", "G5"]],
+        roots=["C3", "F2"], timbre="rhodes", bright=1.0, chord_lvl=0.32, bass_lvl=0.3,
+        rev=(0.20, 0.55, 6500), air=0.42,
+        lead=[(0.40, "G5", 0.13), (1.30, "E5", 0.12), (2.20, "A5", 0.12), (3.05, "C5", 0.12)],
+    ),
     # 荘厳・シネマティック（プレミアムなドキュメンタリー感）
     "cinematic": dict(
         seg=8.0,
@@ -177,6 +201,8 @@ def build(style):
     mix = bed + bass + lead
     wet, tau, cut = p["rev"]
     mix = reverb(mix, wet, tau, cut)
+    if p.get("air"):   # 高域を足して明るさ・きらめきを加える
+        mix = mix + p["air"] * hp(mix, 2600)
     loop = seamless(mix)
     loop /= (np.max(np.abs(loop)) or 1)
     return loop * 0.72
