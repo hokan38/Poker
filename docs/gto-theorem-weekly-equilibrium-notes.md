@@ -15,6 +15,7 @@
 - 姉妹ノート: [`amu-goole-poker-notes.md`](./amu-goole-poker-notes.md)（Amu(goole)のnote）、[`gto-wizard-japan-youtube-notes.md`](./gto-wizard-japan-youtube-notes.md)（GTO Wizard Japan YouTube）。用語（MDF・α・ポラライズ・01ゲーム・ブロッカー等）は共通なので相互参照可。
 - これは非公式のまとめです。正確・最新の内容は元記事／メンバーシップで確認してください。
 - **補完ノート**: Stage1シリーズの **Stage1-2〜1-5（Call判定均衡思考）** は購入済みで、[`note-purchased-articles-study-notes.md`](./note-purchased-articles-study-notes.md) に本編の要点・思考手順・数値を整理済みです（本ノートの「読めた範囲」はStage1-1どまり）。
+- **【2026-07 更新】メンバーシップ（解答集プラン）加入により、全93記事中55記事が読取可能に**。Stage1〜8の**練習問題解答・解説 全44本**＋復習問題①②＋金脈spot#1・#2 を読破し、[`gto-theorem-membership-study-notes.md`](./gto-theorem-membership-study-notes.md) に整理済み（Stage2〜8の理論本編38本は上位プラン限定のため、解答・解説から理論を復元）。上記「非会員が読めたのは実質3本＋α」という記述は加入前の状況です。
 
 ### 目次
 1. [poker学習のロードマップ（Level1〜5）](#poker学習のロードマップlevel15)
