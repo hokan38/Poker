@@ -55,7 +55,7 @@
 | 18 | ポラライズ -レンジの類別- | ¥500 | 大部分無料(~85-90%) | linear/capped/polarized の三類別、千里眼ゲーム、α=b/(b+p)、MDF=p/(b+p)。末尾のみ有料。 | https://note.com/goole/n/na5d11afa3cb3 |
 | 19 | プリフロップレンジの覚え方 | ¥1310 | 大部分無料(~85-90%) | 最多ビュー記事。open/3bet/4bet/squeeze計算、Key Pocket理論、BTN cold call、polar 3bet、BB defence。末尾のあとがき等のみ有料。 | https://note.com/goole/n/n0848d4ac675f |
 | 20 | Geometric Betsize（幾何級数的bet） | ¥250 | 大部分無料（概念は無料・数学的導出のみ有料） | 各ストリート同倍率でスタックを使い切るサイジング。1ストリートはオールイン最適、マルチはr1=r2で最大。 | https://note.com/goole/n/n7d55df1ca58f |
-| 21 | Flop CBの基礎 (BTN vs BB) | ¥3980 | 一部のみ無料(~15-20%) | BTN vs BB SRPのFlop CB教科書。ボード分類→ハンド振り分けの2ステップ。本編は有料。 | https://note.com/goole/n/necc919ba2516 |
+| 21 | Flop CBの基礎 (BTN vs BB) | ¥3980 | **購入済み**（本編要点を別ノートに整理） | BTN vs BB SRPのFlop CB教科書。ボード分類→ハンド振り分けの2ステップ。→ [`note-purchased-articles-study-notes.md`](./note-purchased-articles-study-notes.md) | https://note.com/goole/n/necc919ba2516 |
 | 22 | Flop CBの基礎 (linear 3bp) | ¥3980 | 一部のみ無料(~30-40%) | linear 3betポットのFlop CB教科書（第2弾）。本編は有料。 | https://note.com/goole/n/n99b4454593e0 |
 | 23 | Flop CBの基礎 (BB 3bp) | ¥4980 | 一部のみ無料(~15-20%) | BB 3betポットのFlop CB教科書（第3弾、2025/1/1公開）。本編は有料。 | https://note.com/goole/n/n5a7f64a9e1b5 |
 | 24 | deepdive into AK-hi-board 先行版 | ¥50000 | 先行公開で~90%無料（著者は購入非推奨） | AKハイボードの集合分析。全ポジション横断の高度戦略。先行版として大半が読める。 | https://note.com/goole/n/n05714818db63 |
